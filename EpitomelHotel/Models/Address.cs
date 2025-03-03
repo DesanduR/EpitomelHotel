@@ -1,4 +1,6 @@
-﻿namespace EpitomelHotel.Models
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
+namespace EpitomelHotel.Models
 {
     public class Address
     {
@@ -9,7 +11,7 @@
         public string Country { get; set; }
         public string Postalcode { get; set; }
 
-
+        
 
     }
 }

@@ -5,19 +5,22 @@ namespace EpitomelHotel.Models
 {
     public class Payments
     {
+        [Key]
         public int PaymentID { get; set; }
-        public Decimal Price { get; set; }
+        public decimal Price { get; set; }
         public DateTime PayementDate { get; set; }
-        public string PaymentMethod { get; set; }
-        public Decimal TotalAmount { get; set; }
 
-        [ForeignKey("BookingID")]
-        
+        [Required(ErrorMessage = "Payment Method required.")]
+        public string PaymentMethod { get; set; }
+        public decimal TotalAmount { get; set; }
+
+        [ForeignKey("BookingID"), Required]
+        public int BookingID { get; set; }
         [Display(Name = "Payements")]
         public Bookings Bookings { get; set; }
 
-        [ForeignKey("BookingServiceID")]
-        
+        [ForeignKey("BookingServiceID"), Required]
+        public int BookingServiceID { get; set; }
         [Display(Name = "Service Name")]
         public BookingService BookingService { get; set; }
 

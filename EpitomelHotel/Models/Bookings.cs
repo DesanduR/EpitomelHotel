@@ -5,24 +5,33 @@ namespace EpitomelHotel.Models
 {
     public class Bookings
     {
+        [Key]
         public int BookingID { get; set; }
+
+        [Required(ErrorMessage = "CheckIN required.")]
         public DateTime CheckIn { get; set; }
+
+        [Required(ErrorMessage = "CheckOUT required.")]
         public DateTime CheckOut { get; set; }
-        public Decimal TotalAmount { get; set; }
+
+      
+        public decimal TotalAmount { get; set; }
         public string PaymentStatus { get; set; }
 
-        [ForeignKey("GuestID")]
-        [Required(ErrorMessage = "Guest Name required.")]
+        [ForeignKey("GuestID"), Required]
+        public int GuestID { get; set; }
+        
         [Display(Name = "Guest Name")]
         public Guest Guest { get; set; }
 
-        [ForeignKey("RoomID")]
-        [Required(ErrorMessage = "Room Number required.")]
+        [ForeignKey("RoomID"), Required]
+        public int RoomID { get; set; }
+        
         [Display(Name = "Room Number")]
         public Rooms Rooms { get; set; }
 
-        [ForeignKey("StaffID")]
-        [Required(ErrorMessage = "StaffID required.")]
+        [ForeignKey("StaffID"), Required]
+        public int StaffID { get; set; }
         [Display(Name = "StaffID")]
         public Staff Staff { get; set; }
 

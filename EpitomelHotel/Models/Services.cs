@@ -6,10 +6,11 @@ namespace EpitomelHotel.Models
 {
     public class Services
     {
+        [Key]
         public int ServiceID { get; set; }
 
         [ForeignKey("GuestID")]
-        [Required(ErrorMessage = "Guest Name required.")]
+        public int GuestId { get; set; }
         [Display(Name = "Guest Name")]
         public Guest Guest { get; set; }
 

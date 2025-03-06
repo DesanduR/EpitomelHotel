@@ -1,4 +1,12 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using EpitomelHotel.Areas.Identity.Data;
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("EpitomelHotelDbContextConnection") ?? throw new InvalidOperationException("Connection string 'EpitomelHotelDbContextConnection' not found.");
+
+builder.Services.AddDbContext<EpitomelHotelDbContext>(options => options.UseSqlServer(connectionString));
+
+builder.Services.AddDefaultIdentity<ApplUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<EpitomelHotelDbContext>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

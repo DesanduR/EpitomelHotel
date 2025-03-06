@@ -16,7 +16,7 @@ namespace EpitomelHotel.Models
         [Required(ErrorMessage = "Capacity required.")]
         public string Capacity { get; set; }
 
-        [ForeignKey("StatusID")]
+        [ForeignKey("StatusID"), Required]
         public int StatusID { get; set; }
         [Display(Name = "Room Status")]
         public Status Status { get; set; }

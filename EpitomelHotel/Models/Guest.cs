@@ -5,6 +5,8 @@ namespace EpitomelHotel.Models
 {
     public class Guest
     {
+        [Key]
+        
         public int GuestId { get; set; }
         
         [Required(ErrorMessage = "First Name required.")]

@@ -8,6 +8,8 @@ namespace EpitomelHotel.Models
         [Key]
         public int BookingID { get; set; }
 
+        public ICollection<Payments> Payments { get; set; }
+
         [Required(ErrorMessage = "CheckIN required.")]
         public DateTime CheckIn { get; set; }
 

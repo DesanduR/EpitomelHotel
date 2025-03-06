@@ -8,6 +8,7 @@ namespace EpitomelHotel.Models
 
         [Key]
         public int BookingServiceID { get; set; }
+        public ICollection<Services> Services { get; set; }
 
         [Required(ErrorMessage = "Service Name required.")]
         public string ServiceName { get; set; } 
@@ -16,7 +17,7 @@ namespace EpitomelHotel.Models
         [ForeignKey("ServiceID"), Required]
         public int ServiceID { get; set; }
         [Display(Name = "Booking Service")]
-        public Services Services { get; set; }
+        
 
         [ForeignKey("GuestID"), Required]
         public int GuestID { get; set; }
@@ -29,6 +30,8 @@ namespace EpitomelHotel.Models
 
         [Display(Name = "Room Number")]
         public Rooms Rooms { get; set; }
+
+        public Payments Payments { get; set; } 
 
 
 

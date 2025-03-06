@@ -7,6 +7,8 @@ namespace EpitomelHotel.Models
     {
         [Key]
         public int PaymentID { get; set; }
+
+        public ICollection<BookingService> BookingService { get; set; }
         public decimal Price { get; set; }
         public DateTime PayementDate { get; set; }
 
@@ -22,7 +24,7 @@ namespace EpitomelHotel.Models
         [ForeignKey("BookingServiceID"), Required]
         public int BookingServiceID { get; set; }
         [Display(Name = "Service Name")]
-        public BookingService BookingService { get; set; }
+        
 
 
     }

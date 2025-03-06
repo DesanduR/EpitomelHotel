@@ -9,6 +9,8 @@ namespace EpitomelHotel.Models
         [Key]
         [Required(ErrorMessage = "Address required.")]
         public int AddressID { get; set; }
+        
+        public ICollection<Guest> Guest { get; set; }
         public string Street { get; set; }
         public string Suburb { get; set; }
         public string City { get; set; }

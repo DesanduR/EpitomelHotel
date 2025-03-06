@@ -9,10 +9,17 @@ namespace EpitomelHotel.Models
         [Key]
         public int ServiceID { get; set; }
 
+        
+
         [ForeignKey("GuestID"), Required]
         public int GuestId { get; set; }
         [Display(Name = "Guest Name")]
         public Guest Guest { get; set; }
 
+        [ForeignKey("BookingServiceID"), Required]
+        public int BookingServiceID { get; set; }
+        public BookingService BookingService { get; set; }
+
+        
     }
 }

@@ -9,6 +9,8 @@ namespace EpitomelHotel.Models
         [Required(ErrorMessage = "RoomID required.")]
         public int RoomID { get; set; }
 
+        public ICollection<BookingService>BookingServices { get; set; }
+
         [Required(ErrorMessage = "RoomType required.")]
         public string RoomType { get; set; }
         [Required(ErrorMessage = "Price required.")]

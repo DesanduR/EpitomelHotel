@@ -10,6 +10,7 @@ namespace EpitomelHotel.Models
         public int GuestId { get; set; }
 
         public ICollection<Bookings> Bookings { get; set; }
+        public ICollection<Services>Services { get; set; }
         
         [Required(ErrorMessage = "First Name required.")]
         public string Firstname { get; set; }

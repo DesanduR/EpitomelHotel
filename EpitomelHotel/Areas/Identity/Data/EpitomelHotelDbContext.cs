@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using EpitomelHotel.Models;
 
 namespace EpitomelHotel.Areas.Identity.Data;
 
@@ -19,4 +20,8 @@ public class EpitomelHotelDbContext : IdentityDbContext<ApplUser>
         // For example, you can rename the ASP.NET Identity table names and more.
         // Add your customizations after calling base.OnModelCreating(builder);
     }
+
+public DbSet<EpitomelHotel.Models.Staff> Staff { get; set; } = default!;
+
+public DbSet<EpitomelHotel.Models.Guest> Guest { get; set; } = default!;
 }

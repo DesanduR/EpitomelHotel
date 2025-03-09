@@ -22,10 +22,9 @@ namespace EpitomelHotel.Models
         public Bookings Bookings { get; set; }
 
         [ForeignKey("BookingServiceID"), Required]
-        public int BookingServiceID { get; set; }
         [Display(Name = "Service Name")]
+        public int BookingServiceID { get; set; }
         
-
 
     }
 }

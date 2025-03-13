@@ -9,6 +9,7 @@ namespace EpitomelHotel.Models
         public int BookingID { get; set; }
 
         public ICollection<Payments> Payments { get; set; }
+        public ICollection<Rooms> Rooms { get; set; }
 
         [Required(ErrorMessage = "CheckIN required.")]
         public DateTime CheckIn { get; set; }
@@ -26,17 +27,10 @@ namespace EpitomelHotel.Models
         [Display(Name = "Guest Name")]
         public Guest Guest { get; set; }
 
-        [ForeignKey("RoomID"), Required]
-        public int RoomID { get; set; }
-        
-        [Display(Name = "Room Number")]
-        public Rooms Rooms { get; set; }
+       
+     
 
-        [ForeignKey("StaffID"), Required]
-        public int StaffID { get; set; }
-        [Display(Name = "StaffID")]
-        public Staff Staff { get; set; }
-
+       
 
 
 

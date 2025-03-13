@@ -23,5 +23,15 @@ namespace EpitomelHotel.Models
         [Display(Name = "Room Status")]
         public Status Status { get; set; }
 
+        [ForeignKey("StaffID"), Required]
+        public int StaffID { get; set; }
+        [Display(Name = "StaffID")]
+        public Staff Staff { get; set; }
+
+
+        [ForeignKey("BookingID"), Required]
+        public int BookingID { get; set; }
+        [Display(Name = "Payements")]
+        public Bookings Bookings { get; set; }
     }
 }

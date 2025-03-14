@@ -26,4 +26,6 @@ public DbSet<EpitomelHotel.Models.Staff> Staff { get; set; } = default!;
 public DbSet<EpitomelHotel.Models.Guest> Guest { get; set; } = default!;
 
 public DbSet<EpitomelHotel.Models.Rooms> Rooms { get; set; } = default!;
+
+public DbSet<EpitomelHotel.Models.Payments> Payments { get; set; } = default!;
 }

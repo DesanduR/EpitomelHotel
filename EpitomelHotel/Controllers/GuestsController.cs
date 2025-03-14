@@ -10,23 +10,22 @@ using EpitomelHotel.Models;
 
 namespace EpitomelHotel.Controllers
 {
-    public class RoomsController : Controller
+    public class GuestsController : Controller
     {
         private readonly EpitomelHotelDbContext _context;
 
-        public RoomsController(EpitomelHotelDbContext context)
+        public GuestsController(EpitomelHotelDbContext context)
         {
             _context = context;
         }
 
-        // GET: Rooms
+        // GET: Guests
         public async Task<IActionResult> Index()
         {
-            var epitomelHotelDbContext = _context.Rooms.Include(r => r.Staff).Include(r => r.Status);
-            return View(await epitomelHotelDbContext.ToListAsync());
+            return View(await _context.Guest.ToListAsync());
         }
 
-        // GET: Rooms/Details/5
+        // GET: Guests/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,45 +33,39 @@ namespace EpitomelHotel.Controllers
                 return NotFound();
             }
 
-            var rooms = await _context.Rooms
-                .Include(r => r.Staff)
-                .Include(r => r.Status)
-                .FirstOrDefaultAsync(m => m.RoomID == id);
-            if (rooms == null)
+            var guest = await _context.Guest
+                .FirstOrDefaultAsync(m => m.GuestId == id);
+            if (guest == null)
             {
                 return NotFound();
             }
 
-            return View(rooms);
+            return View(guest);
         }
 
-        // GET: Rooms/Create
+        // GET: Guests/Create
         public IActionResult Create()
         {
-            ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "StaffID");
-            ViewData["StatusID"] = new SelectList(_context.Set<Status>(), "StatusID", "StatusID");
             return View();
         }
 
-        // POST: Rooms/Create
+        // POST: Guests/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("RoomID,RoomType,Price,Capacity,StatusID,StaffID,BookingID")] Rooms rooms)
+        public async Task<IActionResult> Create([Bind("GuestId,Firstname,Lastname,Email,Phone")] Guest guest)
         {
             if (!ModelState.IsValid)
             {
-                _context.Add(rooms);
+                _context.Add(guest);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "StaffID", rooms.StaffID);
-            ViewData["StatusID"] = new SelectList(_context.Set<Status>(), "StatusID", "StatusID", rooms.StatusID);
-            return View(rooms);
+            return View(guest);
         }
 
-        // GET: Rooms/Edit/5
+        // GET: Guests/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -80,24 +73,22 @@ namespace EpitomelHotel.Controllers
                 return NotFound();
             }
 
-            var rooms = await _context.Rooms.FindAsync(id);
-            if (rooms == null)
+            var guest = await _context.Guest.FindAsync(id);
+            if (guest == null)
             {
                 return NotFound();
             }
-            ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "StaffID", rooms.StaffID);
-            ViewData["StatusID"] = new SelectList(_context.Set<Status>(), "StatusID", "StatusID", rooms.StatusID);
-            return View(rooms);
+            return View(guest);
         }
 
-        // POST: Rooms/Edit/5
+        // POST: Guests/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("RoomID,RoomType,Price,Capacity,StatusID,StaffID,BookingID")] Rooms rooms)
+        public async Task<IActionResult> Edit(int id, [Bind("GuestId,Firstname,Lastname,Email,Phone")] Guest guest)
         {
-            if (id != rooms.RoomID)
+            if (id != guest.GuestId)
             {
                 return NotFound();
             }
@@ -106,12 +97,12 @@ namespace EpitomelHotel.Controllers
             {
                 try
                 {
-                    _context.Update(rooms);
+                    _context.Update(guest);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!RoomsExists(rooms.RoomID))
+                    if (!GuestExists(guest.GuestId))
                     {
                         return NotFound();
                     }
@@ -122,12 +113,10 @@ namespace EpitomelHotel.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "StaffID", rooms.StaffID);
-            ViewData["StatusID"] = new SelectList(_context.Set<Status>(), "StatusID", "StatusID", rooms.StatusID);
-            return View(rooms);
+            return View(guest);
         }
 
-        // GET: Rooms/Delete/5
+        // GET: Guests/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -135,36 +124,34 @@ namespace EpitomelHotel.Controllers
                 return NotFound();
             }
 
-            var rooms = await _context.Rooms
-                .Include(r => r.Staff)
-                .Include(r => r.Status)
-                .FirstOrDefaultAsync(m => m.RoomID == id);
-            if (rooms == null)
+            var guest = await _context.Guest
+                .FirstOrDefaultAsync(m => m.GuestId == id);
+            if (guest == null)
             {
                 return NotFound();
             }
 
-            return View(rooms);
+            return View(guest);
         }
 
-        // POST: Rooms/Delete/5
+        // POST: Guests/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var rooms = await _context.Rooms.FindAsync(id);
-            if (rooms != null)
+            var guest = await _context.Guest.FindAsync(id);
+            if (guest != null)
             {
-                _context.Rooms.Remove(rooms);
+                _context.Guest.Remove(guest);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool RoomsExists(int id)
+        private bool GuestExists(int id)
         {
-            return _context.Rooms.Any(e => e.RoomID == id);
+            return _context.Guest.Any(e => e.GuestId == id);
         }
     }
 }

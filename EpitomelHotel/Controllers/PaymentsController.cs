@@ -56,7 +56,7 @@ namespace EpitomelHotel.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("PaymentID,Price,PayementDate,PaymentMethod,TotalAmount,BookingID")] Payments payments)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 _context.Add(payments);
                 await _context.SaveChangesAsync();
@@ -93,7 +93,7 @@ namespace EpitomelHotel.Controllers
                 return NotFound();
             }
 
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {

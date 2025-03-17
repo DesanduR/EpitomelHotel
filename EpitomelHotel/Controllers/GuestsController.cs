@@ -56,7 +56,7 @@ namespace EpitomelHotel.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("GuestId,Firstname,Lastname,Email,Phone")] Guest guest)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 _context.Add(guest);
                 await _context.SaveChangesAsync();
@@ -93,7 +93,7 @@ namespace EpitomelHotel.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 try
                 {

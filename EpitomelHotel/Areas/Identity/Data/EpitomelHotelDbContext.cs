@@ -28,4 +28,12 @@ public DbSet<EpitomelHotel.Models.Guest> Guest { get; set; } = default!;
 public DbSet<EpitomelHotel.Models.Rooms> Rooms { get; set; } = default!;
 
 public DbSet<EpitomelHotel.Models.Payments> Payments { get; set; } = default!;
+
+public DbSet<EpitomelHotel.Models.Services> Services { get; set; } = default!;
+
+public DbSet<EpitomelHotel.Models.Bookings> Bookings { get; set; } = default!;
+
+public DbSet<EpitomelHotel.Models.BookingService> BookingService { get; set; } = default!;
+
+public DbSet<EpitomelHotel.Models.Status> Status { get; set; } = default!;
 }

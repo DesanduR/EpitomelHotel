@@ -10,22 +10,22 @@ using EpitomelHotel.Models;
 
 namespace EpitomelHotel.Controllers
 {
-    public class StaffsController : Controller
+    public class BookingServicesController : Controller
     {
         private readonly EpitomelHotelDbContext _context;
 
-        public StaffsController(EpitomelHotelDbContext context)
+        public BookingServicesController(EpitomelHotelDbContext context)
         {
             _context = context;
         }
 
-        // GET: Staffs
+        // GET: BookingServices
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Staff.ToListAsync());
+            return View(await _context.BookingService.ToListAsync());
         }
 
-        // GET: Staffs/Details/5
+        // GET: BookingServices/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,39 +33,39 @@ namespace EpitomelHotel.Controllers
                 return NotFound();
             }
 
-            var staff = await _context.Staff
-                .FirstOrDefaultAsync(m => m.StaffID == id);
-            if (staff == null)
+            var bookingService = await _context.BookingService
+                .FirstOrDefaultAsync(m => m.BookingServiceID == id);
+            if (bookingService == null)
             {
                 return NotFound();
             }
 
-            return View(staff);
+            return View(bookingService);
         }
 
-        // GET: Staffs/Create
+        // GET: BookingServices/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Staffs/Create
+        // POST: BookingServices/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("StaffID,Firstname,Lastname,Role,Phonenumber")] Staff staff)
+        public async Task<IActionResult> Create([Bind("BookingServiceID,ServiceName,ServiceCost,ServiceID,RoomID")] BookingService bookingService)
         {
             if (!ModelState.IsValid)
             {
-                _context.Add(staff);
+                _context.Add(bookingService);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(staff);
+            return View(bookingService);
         }
 
-        // GET: Staffs/Edit/5
+        // GET: BookingServices/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -73,22 +73,22 @@ namespace EpitomelHotel.Controllers
                 return NotFound();
             }
 
-            var staff = await _context.Staff.FindAsync(id);
-            if (staff == null)
+            var bookingService = await _context.BookingService.FindAsync(id);
+            if (bookingService == null)
             {
                 return NotFound();
             }
-            return View(staff);
+            return View(bookingService);
         }
 
-        // POST: Staffs/Edit/5
+        // POST: BookingServices/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("StaffID,Firstname,Lastname,Role,Phonenumber")] Staff staff)
+        public async Task<IActionResult> Edit(int id, [Bind("BookingServiceID,ServiceName,ServiceCost,ServiceID,RoomID")] BookingService bookingService)
         {
-            if (id != staff.StaffID)
+            if (id != bookingService.BookingServiceID)
             {
                 return NotFound();
             }
@@ -97,12 +97,12 @@ namespace EpitomelHotel.Controllers
             {
                 try
                 {
-                    _context.Update(staff);
+                    _context.Update(bookingService);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!StaffExists(staff.StaffID))
+                    if (!BookingServiceExists(bookingService.BookingServiceID))
                     {
                         return NotFound();
                     }
@@ -113,10 +113,10 @@ namespace EpitomelHotel.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(staff);
+            return View(bookingService);
         }
 
-        // GET: Staffs/Delete/5
+        // GET: BookingServices/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -124,34 +124,34 @@ namespace EpitomelHotel.Controllers
                 return NotFound();
             }
 
-            var staff = await _context.Staff
-                .FirstOrDefaultAsync(m => m.StaffID == id);
-            if (staff == null)
+            var bookingService = await _context.BookingService
+                .FirstOrDefaultAsync(m => m.BookingServiceID == id);
+            if (bookingService == null)
             {
                 return NotFound();
             }
 
-            return View(staff);
+            return View(bookingService);
         }
 
-        // POST: Staffs/Delete/5
+        // POST: BookingServices/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var staff = await _context.Staff.FindAsync(id);
-            if (staff != null)
+            var bookingService = await _context.BookingService.FindAsync(id);
+            if (bookingService != null)
             {
-                _context.Staff.Remove(staff);
+                _context.BookingService.Remove(bookingService);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool StaffExists(int id)
+        private bool BookingServiceExists(int id)
         {
-            return _context.Staff.Any(e => e.StaffID == id);
+            return _context.BookingService.Any(e => e.BookingServiceID == id);
         }
     }
 }

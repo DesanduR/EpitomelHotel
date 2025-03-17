@@ -11,6 +11,9 @@ namespace EpitomelHotel.Models
 
         public ICollection<BookingService> BookingService { get; set; }
 
+        [Required(ErrorMessage = "ServiceName required.")]
+        public string ServiceName { get; set; }
+
 
 
      

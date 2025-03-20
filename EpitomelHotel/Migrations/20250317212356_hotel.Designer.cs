@@ -210,7 +210,7 @@ namespace EpitomelHotel.Migrations
                     b.Property<int>("BookingsBookingID")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("PayementDate")
+                    b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentMethod")

@@ -18,7 +18,7 @@ namespace EpitomelHotel.Data
                 {
                     return;
                 }
-                var guests = new Guest[]     // There are 30 dummy datas for the Diagnosis table //
+                var guests = new Guest[]     
                 {
                         new Guest { Firstname = "Kimlong", Lastname = "Chour", Email = "kimlongc@gmail.com", Phone = "0223535356" },
                         new Guest { Firstname = "John", Lastname = "Smith", Email = "johndoe@gmail.com", Phone = "0227545856"},
@@ -32,7 +32,7 @@ namespace EpitomelHotel.Data
                 Context.Guest.AddRange(guests);
                 Context.SaveChanges();
 
-                var services = new Services[]     // There are 30 dummy datas for the Hospital table //
+                var services = new Services[]     
                 {
                         new Services { ServiceName = "Room Service" },
                         new Services { ServiceName = "Laundry" },
@@ -46,7 +46,7 @@ namespace EpitomelHotel.Data
                 Context.SaveChanges();
 
 
-                var staff = new Staff[]     // There are 30 dummy datas for the Patient table //
+                var staff = new Staff[]     
                 {
                         new Staff { Firstname = "William", Lastname = "Bob", Phonenumber = "02407483987", Role = "Receptionist", },
                         new Staff { Firstname = "Olivia", Lastname = "Smith", Phonenumber = "0546757467", Role = "Manager", },
@@ -57,7 +57,7 @@ namespace EpitomelHotel.Data
                 Context.Staff.AddRange(staff);
                 Context.SaveChanges();
 
-                var status = new Status[]     // There are 30 dummy datas for the Doctor table //
+                var status = new Status[]     
                 {
                         new Status { StatusName = "Free", },
                         new Status { StatusName = "Booked", },
@@ -66,41 +66,45 @@ namespace EpitomelHotel.Data
                 Context.Status.AddRange(status);
                 Context.SaveChanges();
 
-                var AppointmentTimes = new Appointment[]     // There are 30 dummy datas for the Appointment table //
+                var bookings = new Bookings[]     
                 {
-                        new Appointment { Date = new DateTime(2024, 7, 23, 9, 15, 0), PatientId = 1, DoctorId = 1 },
-                        new Appointment { Date = new DateTime(2024, 7, 24, 10, 0, 0), PatientId = 2, DoctorId = 2 },
-                        new Appointment { Date = new DateTime(2024, 7, 25, 11, 30, 0), PatientId = 3, DoctorId = 3 },
-                        new Appointment { Date = new DateTime(2024, 7, 26, 9, 15, 0), PatientId = 4, DoctorId = 4 },
-                        new Appointment { Date = new DateTime(2024, 7, 27, 13, 45, 0), PatientId = 5, DoctorId = 5 },
-                        new Appointment { Date = new DateTime(2024, 7, 28, 8, 30, 0), PatientId = 6, DoctorId = 6 },
-                        new Appointment { Date = new DateTime(2024, 7, 29, 14, 0, 0), PatientId = 7, DoctorId = 7 },
-                        new Appointment { Date = new DateTime(2024, 7, 30, 15, 15, 0), PatientId = 8, DoctorId = 8 },
-                        new Appointment { Date = new DateTime(2024, 7, 31, 10, 45, 0), PatientId = 9, DoctorId = 9 },
-                        new Appointment { Date = new DateTime(2024, 8, 1, 12, 0, 0), PatientId = 10, DoctorId = 10 },
-                        new Appointment { Date = new DateTime(2024, 8, 2, 16, 30, 0), PatientId = 11, DoctorId = 11 },
-                        new Appointment { Date = new DateTime(2024, 8, 3, 9, 0, 0), PatientId = 12, DoctorId = 12 },
-                        new Appointment { Date = new DateTime(2024, 8, 4, 11, 0, 0), PatientId = 13, DoctorId = 13 },
-                        new Appointment { Date = new DateTime(2024, 8, 5, 13, 30, 0), PatientId = 14, DoctorId = 14 },
-                        new Appointment { Date = new DateTime(2024, 8, 6, 14, 45, 0), PatientId = 15, DoctorId = 15 },
-                        new Appointment { Date = new DateTime(2024, 8, 7, 9, 15, 0), PatientId = 16, DoctorId = 16 },
-                        new Appointment { Date = new DateTime(2024, 8, 8, 10, 0, 0), PatientId = 17, DoctorId = 17 },
-                        new Appointment { Date = new DateTime(2024, 8, 9, 11, 30, 0), PatientId = 18, DoctorId = 18 },
-                        new Appointment { Date = new DateTime(2024, 8, 10, 9, 15, 0), PatientId = 19, DoctorId = 19 },
-                        new Appointment { Date = new DateTime(2024, 8, 11, 13, 45, 0), PatientId = 20, DoctorId = 20 },
-                        new Appointment { Date = new DateTime(2024, 8, 12, 8, 30, 0), PatientId = 21, DoctorId = 21 },
-                        new Appointment { Date = new DateTime(2024, 8, 13, 14, 0, 0), PatientId = 22, DoctorId = 22 },
-                        new Appointment { Date = new DateTime(2024, 8, 14, 15, 15, 0), PatientId = 23, DoctorId = 23 },
-                        new Appointment { Date = new DateTime(2024, 8, 15, 10, 45, 0), PatientId = 24, DoctorId = 24 },
-                        new Appointment { Date = new DateTime(2024, 8, 16, 12, 0, 0), PatientId = 25, DoctorId = 25 },
-                        new Appointment { Date = new DateTime(2024, 8, 17, 16, 30, 0), PatientId = 26, DoctorId = 26 },
-                        new Appointment { Date = new DateTime(2024, 8, 18, 9, 0, 0), PatientId = 27, DoctorId = 27 },
-                        new Appointment { Date = new DateTime(2024, 8, 19, 11, 0, 0), PatientId = 28, DoctorId = 28 },
-                        new Appointment { Date = new DateTime(2024, 8, 20, 13, 30, 0), PatientId = 29, DoctorId = 29 },
-                        new Appointment { Date = new DateTime(2024, 8, 21, 14, 45, 0), PatientId = 30, DoctorId = 30 }
+                        new Bookings { CheckIn = new DateTime(2024, 7, 23, 9, 15, 0),CheckOut = new DateTime(2024, 8, 21, 2, 12, 0), TotalAmount = 165, PaymentStatus = "Paid", GuestID = 1 },
+                        new Bookings { CheckIn = new DateTime(2024, 7, 24, 10, 0, 0),CheckOut = new DateTime(2024, 8, 25, 21, 11, 0), TotalAmount = 160, PaymentStatus = "Paid", GuestID = 2 },
+                        new Bookings { CheckIn = new DateTime(2024, 7, 24, 11, 12, 0),CheckOut = new DateTime(2024, 8, 22, 20, 11, 0), TotalAmount = 175, PaymentStatus = "Not Paid", GuestID = 3 },
+                        new Bookings { CheckIn = new DateTime(2024, 7, 26, 12, 33, 0),CheckOut = new DateTime(2024, 8, 28, 19, 15, 0), TotalAmount = 180, PaymentStatus = "Not Paid", GuestID = 4 },
+                        new Bookings { CheckIn = new DateTime(2024, 7, 26, 14, 11, 0),CheckOut = new DateTime(2024, 8, 27, 21, 10, 0), TotalAmount = 120, PaymentStatus = "Paid", GuestID = 5 },
                 };
-                Context.AppointmentTime.AddRange(AppointmentTimes);
+                Context.Bookings.AddRange(bookings);
                 Context.SaveChanges();
+
+
+                var payments = new Payments[]     // There are 30 dummy datas for the Appointment table //
+                {
+                        new Payments { PaymentDate = new DateTime(2024, 7, 23, 9, 15, 0),TotalAmount = 130, Price = 60, BookingID = 1 },
+                        new Payments { PaymentDate = new DateTime(2024, 7, 24, 10, 0, 0),TotalAmount = 145, Price = 50, BookingID = 2 },
+                        new Payments { PaymentDate = new DateTime(2024, 7, 24, 11, 12, 0),TotalAmount = 160, Price = 70, BookingID = 3 },
+                        new Payments { PaymentDate = new DateTime(2024, 7, 26, 12, 33, 0),TotalAmount = 135, Price = 65, BookingID = 4 },
+                        new Payments { PaymentDate = new DateTime(2024, 7, 26, 14, 11, 0),TotalAmount = 170, Price = 75, BookingID = 5 },
+                };
+                Context.Payments.AddRange(payments);
+                Context.SaveChanges();
+
+
+                var bookingservice = new BookingService[]     // There are 30 dummy datas for the Appointment table //
+               {
+                        new BookingService { ServiceName = "Room Service", ServiceCost = 60, ServiceID = 1, RoomID = 1 },
+                        new BookingService { ServiceName = "Cleaning Service", ServiceCost = 50, ServiceID = 2, RoomID = 2 },
+                        new BookingService { ServiceName = "Valet Parking", ServiceCost = 10, ServiceID = 3, RoomID = 3 },
+                        new BookingService { ServiceName = "Pet Services", ServiceCost = 45, ServiceID = 4, RoomID = 4 },
+                        
+               };
+                Context.BookingService.AddRange(bookingservice);
+                Context.SaveChanges();
+
+
+
+
+
             }
         }
     }

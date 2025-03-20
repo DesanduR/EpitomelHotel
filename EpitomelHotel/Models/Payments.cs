@@ -10,7 +10,7 @@ namespace EpitomelHotel.Models
 
         
         public decimal Price { get; set; }
-        public DateTime PayementDate { get; set; }
+        public DateTime PaymentDate { get; set; }
 
         [Required(ErrorMessage = "Payment Method required.")]
         public string PaymentMethod { get; set; }

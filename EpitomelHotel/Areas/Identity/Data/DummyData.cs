@@ -14,7 +14,7 @@ namespace EpitomelHotel.Data
                 var Context = serviceScope.ServiceProvider.GetService<EpitomelHotelDbContext>();
                 Context.Database.EnsureCreated();
 
-                if (Context.Guest.Any() || Context.Rooms.Any() || Context.Bookings.Any() || Context.Payments.Any() || Context.Services.Any() || Context.BookingService.Any() || Context.Staff.Any() || Context.Status.Any())
+                if (Context.Guest.Any() || Context.Services.Any() || Context.Staff.Any() || Context.Status.Any() || Context.Bookings.Any() || Context.Payments.Any() || Context.BookingService.Any())
                 {
                     return;
                 }
@@ -78,19 +78,36 @@ namespace EpitomelHotel.Data
                 Context.SaveChanges();
 
 
-                var payments = new Payments[]     // There are 30 dummy datas for the Appointment table //
+                var payments = new Payments[]     
                 {
-                        new Payments { PaymentDate = new DateTime(2024, 7, 23, 9, 15, 0),TotalAmount = 130, Price = 60, BookingID = 1 },
-                        new Payments { PaymentDate = new DateTime(2024, 7, 24, 10, 0, 0),TotalAmount = 145, Price = 50, BookingID = 2 },
-                        new Payments { PaymentDate = new DateTime(2024, 7, 24, 11, 12, 0),TotalAmount = 160, Price = 70, BookingID = 3 },
-                        new Payments { PaymentDate = new DateTime(2024, 7, 26, 12, 33, 0),TotalAmount = 135, Price = 65, BookingID = 4 },
-                        new Payments { PaymentDate = new DateTime(2024, 7, 26, 14, 11, 0),TotalAmount = 170, Price = 75, BookingID = 5 },
+                        new Payments { PaymentDate = new DateTime(2024, 7, 23, 9, 15, 0),PaymentMethod = "Cash", TotalAmount = 130, Price = 60, BookingID = 1 },
+                        new Payments { PaymentDate = new DateTime(2024, 7, 24, 10, 0, 0),PaymentMethod = "Credit Card", TotalAmount = 145, Price = 50, BookingID = 2 },
+                        new Payments { PaymentDate = new DateTime(2024, 7, 24, 11, 12, 0),PaymentMethod = "Debit Card", TotalAmount = 160, Price = 70, BookingID = 3 },
+                        new Payments { PaymentDate = new DateTime(2024, 7, 26, 12, 33, 0),PaymentMethod = "Cash", TotalAmount = 135, Price = 65, BookingID = 4 },
+                        new Payments { PaymentDate = new DateTime(2024, 7, 26, 14, 11, 0),PaymentMethod = "Cash", TotalAmount = 170, Price = 75, BookingID = 5 },
                 };
                 Context.Payments.AddRange(payments);
                 Context.SaveChanges();
 
 
-                var bookingservice = new BookingService[]     // There are 30 dummy datas for the Appointment table //
+
+                var rooms = new Rooms[]
+               {
+                        new Rooms { RoomType = "Suite", Capacity = "4", Price = 60, StatusID = 1, BookingID = 1, StaffID = 1 },
+                        new Rooms { RoomType = "King Room", Capacity = "6", Price = 80, StatusID = 2, BookingID = 2, StaffID = 2 },
+                        new Rooms { RoomType = "Double Room", Capacity = "4", Price = 55, StatusID = 1, BookingID = 3, StaffID = 3 },
+                        new Rooms { RoomType = "Queen Room", Capacity = "5", Price = 70, StatusID = 1, BookingID = 4, StaffID = 4 },
+                        new Rooms { RoomType = "Deluxe Room", Capacity = "5", Price = 85, StatusID = 2, BookingID = 5, StaffID = 5 },
+
+               };
+                Context.Rooms.AddRange(rooms);
+                Context.SaveChanges();
+
+
+
+
+
+                var bookingservices = new BookingService[]     
                {
                         new BookingService { ServiceName = "Room Service", ServiceCost = 60, ServiceID = 1, RoomID = 1 },
                         new BookingService { ServiceName = "Cleaning Service", ServiceCost = 50, ServiceID = 2, RoomID = 2 },
@@ -98,8 +115,9 @@ namespace EpitomelHotel.Data
                         new BookingService { ServiceName = "Pet Services", ServiceCost = 45, ServiceID = 4, RoomID = 4 },
                         
                };
-                Context.BookingService.AddRange(bookingservice);
+                Context.BookingService.AddRange(bookingservices);
                 Context.SaveChanges();
+
 
 
 

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EpitomelHotel.Migrations
 {
     [DbContext(typeof(EpitomelHotelDbContext))]
-    [Migration("20250317212356_hotel")]
-    partial class hotel
+    [Migration("20250323223551_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -280,6 +280,10 @@ namespace EpitomelHotel.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ServiceID"));
 
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("ServiceID");
 
                     b.ToTable("Services");
@@ -301,8 +305,9 @@ namespace EpitomelHotel.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Phonenumber")
-                        .HasColumnType("int");
+                    b.Property<string>("Phonenumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
                         .IsRequired()

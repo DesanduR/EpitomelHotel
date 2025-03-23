@@ -13,11 +13,12 @@ namespace EpitomelHotel.Models
 
         [Required(ErrorMessage = "ServiceName required.")]
         public string ServiceName { get; set; }
+        public decimal ServiceCost { get; set; }
 
 
 
-     
 
-        
+
+
     }
 }

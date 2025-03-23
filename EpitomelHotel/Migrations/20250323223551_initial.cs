@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EpitomelHotel.Migrations
 {
     /// <inheritdoc />
-    public partial class hotel : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -71,7 +71,8 @@ namespace EpitomelHotel.Migrations
                 columns: table => new
                 {
                     ServiceID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1")
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ServiceName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -87,7 +88,7 @@ namespace EpitomelHotel.Migrations
                     Firstname = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Lastname = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phonenumber = table.Column<int>(type: "int", nullable: false)
+                    Phonenumber = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {

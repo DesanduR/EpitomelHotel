@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using EpitomelHotel.Models;
+using System.Reflection.Emit;
 
 namespace EpitomelHotel.Areas.Identity.Data;
 
@@ -15,10 +16,14 @@ public class EpitomelHotelDbContext : IdentityDbContext<ApplUser>
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(builder);
-        // Customize the ASP.NET Identity model and override the defaults if needed.
-        // For example, you can rename the ASP.NET Identity table names and more.
-        // Add your customizations after calling base.OnModelCreating(builder);
+        builder.Entity<Guest>().ToTable("Guest");
+        builder.Entity<Payments>().ToTable("Payments");
+        builder.Entity<BookingService>().ToTable("BookingService");
+        builder.Entity<Bookings>().ToTable("Booking");
+        builder.Entity<Rooms>().ToTable("Rooms");
+        builder.Entity<Services>().ToTable("Service");
+        builder.Entity<Status>().ToTable("Status");
+        builder.Entity<Staff>().ToTable("Staff");
     }
 
 public DbSet<EpitomelHotel.Models.Staff> Staff { get; set; } = default!;

@@ -29,7 +29,13 @@ namespace EpitomelHotel.Data
                         new Guest { Firstname = "Eve", Lastname = "Davis", Email = "eve.davis@example.com", Phone = "0435678901" }
 
                 };
-                Context.Guest.AddRange(guests);
+                foreach (Guest g in guests)
+                {
+                    Context.Guest.Add(g);
+                }
+
+
+                
                 Context.SaveChanges();
 
                 var services = new Services[]     
@@ -42,7 +48,13 @@ namespace EpitomelHotel.Data
                         new Services { ServiceName = "Concierge" },
                         new Services { ServiceName = "Housekeeping" }
             };
-                Context.Services.AddRange(services);
+                foreach (Services a in services)
+                {
+                    Context.Services.Add(a);
+                }
+
+
+                
                 Context.SaveChanges();
 
 
@@ -54,7 +66,14 @@ namespace EpitomelHotel.Data
                         new Staff { Firstname = "Emma", Lastname = "Brown", Phonenumber = "02454864867", Role = "Cleaner", },
                         new Staff { Firstname = "James", Lastname = "Taylor", Phonenumber = "02546646556", Role = "Chef", },
                 };
-                Context.Staff.AddRange(staff);
+
+                foreach (Staff b in staff)
+                {
+                    Context.Staff.Add(b);
+                }
+
+
+                
                 Context.SaveChanges();
 
                 var status = new Status[]     
@@ -63,7 +82,13 @@ namespace EpitomelHotel.Data
                         new Status { StatusName = "Booked", },
 
                 };
-                Context.Status.AddRange(status);
+
+                foreach (Status c in status)
+                {
+                    Context.Status.Add(c);
+                }
+
+                
                 Context.SaveChanges();
 
                 var bookings = new Bookings[]     
@@ -74,7 +99,13 @@ namespace EpitomelHotel.Data
                         new Bookings { CheckIn = new DateTime(2024, 7, 26, 12, 33, 0),CheckOut = new DateTime(2024, 8, 28, 19, 15, 0), TotalAmount = 180, PaymentStatus = "Not Paid", GuestID = 4 },
                         new Bookings { CheckIn = new DateTime(2024, 7, 26, 14, 11, 0),CheckOut = new DateTime(2024, 8, 27, 21, 10, 0), TotalAmount = 120, PaymentStatus = "Paid", GuestID = 5 },
                 };
-                Context.Bookings.AddRange(bookings);
+
+                foreach (Bookings d in bookings)
+                {
+                    Context.Bookings.Add(d);
+                }
+
+                
                 Context.SaveChanges();
 
 
@@ -86,7 +117,13 @@ namespace EpitomelHotel.Data
                         new Payments { PaymentDate = new DateTime(2024, 7, 26, 12, 33, 0),PaymentMethod = "Cash", TotalAmount = 135, Price = 65, BookingID = 4 },
                         new Payments { PaymentDate = new DateTime(2024, 7, 26, 14, 11, 0),PaymentMethod = "Cash", TotalAmount = 170, Price = 75, BookingID = 5 },
                 };
-                Context.Payments.AddRange(payments);
+
+                foreach (Payments e in payments)
+                {
+                    Context.Payments.Add(e);
+                }
+
+                
                 Context.SaveChanges();
 
 
@@ -100,7 +137,13 @@ namespace EpitomelHotel.Data
                         new Rooms { RoomType = "Deluxe Room", Capacity = "5", Price = 85, StatusID = 2, BookingID = 5, StaffID = 5 },
 
                };
-                Context.Rooms.AddRange(rooms);
+
+                foreach (Rooms f in rooms)
+                {
+                    Context.Rooms.Add(f);
+                }
+
+                
                 Context.SaveChanges();
 
 
@@ -113,9 +156,16 @@ namespace EpitomelHotel.Data
                         new BookingService { ServiceName = "Cleaning Service", ServiceCost = 50, ServiceID = 2, RoomID = 2 },
                         new BookingService { ServiceName = "Valet Parking", ServiceCost = 10, ServiceID = 3, RoomID = 3 },
                         new BookingService { ServiceName = "Pet Services", ServiceCost = 45, ServiceID = 4, RoomID = 4 },
+
                         
                };
-                Context.BookingService.AddRange(bookingservices);
+
+                foreach (BookingService g in bookingservices)
+                {
+                    Context.BookingService.Add(g);
+                }
+
+                
                 Context.SaveChanges();
 
 

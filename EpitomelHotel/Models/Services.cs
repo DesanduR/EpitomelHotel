@@ -9,11 +9,11 @@ namespace EpitomelHotel.Models
         [Key]
         public int ServiceID { get; set; }
 
-        public ICollection<BookingService> BookingService { get; set; }
+        
 
         [Required(ErrorMessage = "ServiceName required.")]
         public string ServiceName { get; set; }
-        public decimal ServiceCost { get; set; }
+        
 
 
 

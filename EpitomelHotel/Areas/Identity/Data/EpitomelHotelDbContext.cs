@@ -14,8 +14,11 @@ public class EpitomelHotelDbContext : IdentityDbContext<ApplUser>
     {
     }
 
+    
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        base.OnModelCreating(builder);
         builder.Entity<Guest>().ToTable("Guest");
         builder.Entity<Payments>().ToTable("Payments");
         builder.Entity<BookingService>().ToTable("BookingService");

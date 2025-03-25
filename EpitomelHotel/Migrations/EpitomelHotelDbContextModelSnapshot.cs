@@ -22,21 +22,6 @@ namespace EpitomelHotel.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("BookingServiceServices", b =>
-                {
-                    b.Property<int>("BookingServiceID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ServicesServiceID")
-                        .HasColumnType("int");
-
-                    b.HasKey("BookingServiceID", "ServicesServiceID");
-
-                    b.HasIndex("ServicesServiceID");
-
-                    b.ToTable("BookingServiceServices");
-                });
-
             modelBuilder.Entity("EpitomelHotel.Areas.Identity.Data.ApplUser", b =>
                 {
                     b.Property<string>("Id")
@@ -130,7 +115,7 @@ namespace EpitomelHotel.Migrations
 
                     b.HasIndex("RoomsRoomID");
 
-                    b.ToTable("BookingService");
+                    b.ToTable("BookingService", (string)null);
                 });
 
             modelBuilder.Entity("EpitomelHotel.Models.Bookings", b =>
@@ -161,7 +146,7 @@ namespace EpitomelHotel.Migrations
 
                     b.HasIndex("GuestID");
 
-                    b.ToTable("Bookings");
+                    b.ToTable("Booking", (string)null);
                 });
 
             modelBuilder.Entity("EpitomelHotel.Models.Guest", b =>
@@ -190,7 +175,7 @@ namespace EpitomelHotel.Migrations
 
                     b.HasKey("GuestId");
 
-                    b.ToTable("Guest");
+                    b.ToTable("Guest", (string)null);
                 });
 
             modelBuilder.Entity("EpitomelHotel.Models.Payments", b =>
@@ -224,7 +209,7 @@ namespace EpitomelHotel.Migrations
 
                     b.HasIndex("BookingsBookingID");
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("EpitomelHotel.Models.Rooms", b =>
@@ -266,7 +251,7 @@ namespace EpitomelHotel.Migrations
 
                     b.HasIndex("StatusID");
 
-                    b.ToTable("Rooms");
+                    b.ToTable("Rooms", (string)null);
                 });
 
             modelBuilder.Entity("EpitomelHotel.Models.Services", b =>
@@ -277,13 +262,18 @@ namespace EpitomelHotel.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ServiceID"));
 
+                    b.Property<int?>("BookingServiceID")
+                        .HasColumnType("int");
+
                     b.Property<string>("ServiceName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ServiceID");
 
-                    b.ToTable("Services");
+                    b.HasIndex("BookingServiceID");
+
+                    b.ToTable("Service", (string)null);
                 });
 
             modelBuilder.Entity("EpitomelHotel.Models.Staff", b =>
@@ -312,7 +302,7 @@ namespace EpitomelHotel.Migrations
 
                     b.HasKey("StaffID");
 
-                    b.ToTable("Staff");
+                    b.ToTable("Staff", (string)null);
                 });
 
             modelBuilder.Entity("EpitomelHotel.Models.Status", b =>
@@ -329,7 +319,7 @@ namespace EpitomelHotel.Migrations
 
                     b.HasKey("StatusID");
 
-                    b.ToTable("Status");
+                    b.ToTable("Status", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -469,21 +459,6 @@ namespace EpitomelHotel.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("BookingServiceServices", b =>
-                {
-                    b.HasOne("EpitomelHotel.Models.BookingService", null)
-                        .WithMany()
-                        .HasForeignKey("BookingServiceID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EpitomelHotel.Models.Services", null)
-                        .WithMany()
-                        .HasForeignKey("ServicesServiceID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("EpitomelHotel.Models.BookingService", b =>
                 {
                     b.HasOne("EpitomelHotel.Models.Rooms", "Rooms")
@@ -544,6 +519,13 @@ namespace EpitomelHotel.Migrations
                     b.Navigation("Status");
                 });
 
+            modelBuilder.Entity("EpitomelHotel.Models.Services", b =>
+                {
+                    b.HasOne("EpitomelHotel.Models.BookingService", null)
+                        .WithMany("Services")
+                        .HasForeignKey("BookingServiceID");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -593,6 +575,11 @@ namespace EpitomelHotel.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("EpitomelHotel.Models.BookingService", b =>
+                {
+                    b.Navigation("Services");
                 });
 
             modelBuilder.Entity("EpitomelHotel.Models.Bookings", b =>

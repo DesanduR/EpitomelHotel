@@ -25,7 +25,7 @@
                 @Html.DisplayNameFor(model => model.PaymentStatus)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Guest)
+                @Html.DisplayNameFor(model => model.ApplUser)
             </th>
             <th></th>
         </tr>
@@ -46,7 +46,7 @@
                 @Html.DisplayFor(modelItem => item.PaymentStatus)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Guest.Email)
+                @Html.DisplayFor(modelItem => item.ApplUser.Email)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.BookingID">Edit</a> |

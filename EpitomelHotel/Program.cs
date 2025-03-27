@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using EpitomelHotel.Areas.Identity.Data;
-using EpitomelHotel.Data;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("EpitomelHotelDbContextConnection") ?? throw new InvalidOperationException("Connection string 'EpitomelHotelDbContextConnection' not found.");
 
@@ -33,6 +32,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-DatabaseStartup.StartUp(app);
-
+app.MapRazorPages();
 app.Run();

@@ -54,7 +54,7 @@ namespace EpitomelHotel.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BookingServiceID,ServiceCost,ServiceName,ServiceID,RoomID")] BookingService bookingService)
+        public async Task<IActionResult> Create([Bind("BookingServiceID,ServiceCost,ServiceID,RoomID")] BookingService bookingService)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +86,7 @@ namespace EpitomelHotel.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("BookingServiceID,ServiceCost,ServiceName,ServiceID,RoomID")] BookingService bookingService)
+        public async Task<IActionResult> Edit(int id, [Bind("BookingServiceID,ServiceCost,ServiceID,RoomID")] BookingService bookingService)
         {
             if (id != bookingService.BookingServiceID)
             {

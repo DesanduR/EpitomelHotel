@@ -19,7 +19,7 @@ public class EpitomelHotelDbContext : IdentityDbContext<ApplUser>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        builder.Entity<Guest>().ToTable("Guest");
+
         builder.Entity<Payments>().ToTable("Payments");
         builder.Entity<BookingService>().ToTable("BookingService");
         builder.Entity<Bookings>().ToTable("Booking");
@@ -30,8 +30,6 @@ public class EpitomelHotelDbContext : IdentityDbContext<ApplUser>
     }
 
 public DbSet<EpitomelHotel.Models.Staff> Staff { get; set; } = default!;
-
-public DbSet<EpitomelHotel.Models.Guest> Guest { get; set; } = default!;
 
 public DbSet<EpitomelHotel.Models.Rooms> Rooms { get; set; } = default!;
 
@@ -44,4 +42,6 @@ public DbSet<EpitomelHotel.Models.Bookings> Bookings { get; set; } = default!;
 public DbSet<EpitomelHotel.Models.BookingService> BookingService { get; set; } = default!;
 
 public DbSet<EpitomelHotel.Models.Status> Status { get; set; } = default!;
+public DbSet<EpitomelHotel.Areas.Identity.Data.ApplUser> ApplUser { get; set; } = default!;
+
 }

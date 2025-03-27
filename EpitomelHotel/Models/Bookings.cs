@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using EpitomelHotel.Areas.Identity.Data;
 
 namespace EpitomelHotel.Models
 {
@@ -21,11 +22,11 @@ namespace EpitomelHotel.Models
         public decimal TotalAmount { get; set; }
         public string PaymentStatus { get; set; }
 
-        [ForeignKey("GuestID"), Required]
-        public int GuestID { get; set; }
+        [ForeignKey("ApplUser"), Required]
+        public string ApplUserID { get; set; }
         
-        [Display(Name = "Guest Name")]
-        public Guest Guest { get; set; }
+        [Display(Name = "ApplUser Name")]
+        public ApplUser ApplUser { get; set; }
 
        
      

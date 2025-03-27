@@ -22,7 +22,7 @@ namespace EpitomelHotel.Controllers
         // GET: Bookings
         public async Task<IActionResult> Index()
         {
-            var epitomelHotelDbContext = _context.Bookings.Include(b => b.Guest);
+            var epitomelHotelDbContext = _context.Bookings.Include(b => b.ApplUser);
             return View(await epitomelHotelDbContext.ToListAsync());
         }
 
@@ -35,7 +35,7 @@ namespace EpitomelHotel.Controllers
             }
 
             var bookings = await _context.Bookings
-                .Include(b => b.Guest)
+                .Include(b => b.ApplUser)
                 .FirstOrDefaultAsync(m => m.BookingID == id);
             if (bookings == null)
             {
@@ -48,7 +48,7 @@ namespace EpitomelHotel.Controllers
         // GET: Bookings/Create
         public IActionResult Create()
         {
-            ViewData["GuestID"] = new SelectList(_context.Guest, "GuestId", "Email");
+            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "ApplUserId", "Email");
             return View();
         }
 
@@ -57,7 +57,7 @@ namespace EpitomelHotel.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BookingID,CheckIn,CheckOut,TotalAmount,PaymentStatus,GuestID")] Bookings bookings)
+        public async Task<IActionResult> Create([Bind("BookingID,CheckIn,CheckOut,TotalAmount,PaymentStatus,ApplUserID")] Bookings bookings)
         {
             if (!ModelState.IsValid)
             {
@@ -65,7 +65,7 @@ namespace EpitomelHotel.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["GuestID"] = new SelectList(_context.Guest, "GuestId", "Email", bookings.GuestID);
+            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "ApplUserId", "Email", bookings.ApplUserID);
             return View(bookings);
         }
 
@@ -82,7 +82,7 @@ namespace EpitomelHotel.Controllers
             {
                 return NotFound();
             }
-            ViewData["GuestID"] = new SelectList(_context.Guest, "GuestId", "Email", bookings.GuestID);
+            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "ApplUserId", "Email", bookings.ApplUserID);
             return View(bookings);
         }
 
@@ -91,7 +91,7 @@ namespace EpitomelHotel.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("BookingID,CheckIn,CheckOut,TotalAmount,PaymentStatus,GuestID")] Bookings bookings)
+        public async Task<IActionResult> Edit(int id, [Bind("BookingID,CheckIn,CheckOut,TotalAmount,PaymentStatus,ApplUserID")] Bookings bookings)
         {
             if (id != bookings.BookingID)
             {
@@ -118,7 +118,7 @@ namespace EpitomelHotel.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["GuestID"] = new SelectList(_context.Guest, "GuestId", "Email", bookings.GuestID);
+            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "ApplUserId", "Email", bookings.ApplUserID);
             return View(bookings);
         }
 
@@ -131,7 +131,7 @@ namespace EpitomelHotel.Controllers
             }
 
             var bookings = await _context.Bookings
-                .Include(b => b.Guest)
+                .Include(b => b.ApplUser)
                 .FirstOrDefaultAsync(m => m.BookingID == id);
             if (bookings == null)
             {

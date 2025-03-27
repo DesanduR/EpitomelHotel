@@ -13,7 +13,7 @@ namespace EpitomelHotel.Models
 
         [Required(ErrorMessage = "Service Name required.")]
         public decimal ServiceCost { get; set; }
-        public string ServiceName { get; set; }
+        
 
 
         [ForeignKey("ServiceID"), Required]

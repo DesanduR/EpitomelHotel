@@ -54,9 +54,9 @@ namespace EpitomelHotel.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("StaffID,Firstname,Lastname,Role,Phonenumber")] Staff staff)
+        public async Task<IActionResult> Create([Bind("StaffID,Firstname,Lastname,Profession,Phonenumber")] Staff staff)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 _context.Add(staff);
                 await _context.SaveChangesAsync();
@@ -86,14 +86,14 @@ namespace EpitomelHotel.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("StaffID,Firstname,Lastname,Role,Phonenumber")] Staff staff)
+        public async Task<IActionResult> Edit(int id, [Bind("StaffID,Firstname,Lastname,Profession,Phonenumber")] Staff staff)
         {
             if (id != staff.StaffID)
             {
                 return NotFound();
             }
 
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {

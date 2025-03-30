@@ -28,6 +28,7 @@ namespace EpitomelHotel.Models
         [Display(Name = "ApplUser Name")]
         public ApplUser ApplUser { get; set; }
 
+
        
      
 

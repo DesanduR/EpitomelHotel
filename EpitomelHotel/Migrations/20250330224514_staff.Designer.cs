@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EpitomelHotel.Migrations
 {
     [DbContext(typeof(EpitomelHotelDbContext))]
-    [Migration("20250327012356_update")]
-    partial class update
+    [Migration("20250330224514_staff")]
+    partial class staff
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,6 +44,14 @@ namespace EpitomelHotel.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Firstname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Lastname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -59,6 +67,10 @@ namespace EpitomelHotel.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
@@ -125,14 +137,15 @@ namespace EpitomelHotel.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookingID"));
 
+                    b.Property<string>("ApplUserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("CheckIn")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CheckOut")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("ApplUserID")
-                        .HasColumnType("int");
 
                     b.Property<string>("PaymentStatus")
                         .IsRequired()
@@ -146,35 +159,6 @@ namespace EpitomelHotel.Migrations
                     b.HasIndex("ApplUserID");
 
                     b.ToTable("Booking", (string)null);
-                });
-
-            modelBuilder.Entity("EpitomelHotel.Models.ApplUser", b =>
-                {
-                    b.Property<int>("ApplUserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ApplUserId"));
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Firstname")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Lastname")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ApplUserId");
-
-                    b.ToTable("ApplUser", (string)null);
                 });
 
             modelBuilder.Entity("EpitomelHotel.Models.Payments", b =>
@@ -295,7 +279,7 @@ namespace EpitomelHotel.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Role")
+                    b.Property<string>("Profession")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -471,7 +455,7 @@ namespace EpitomelHotel.Migrations
 
             modelBuilder.Entity("EpitomelHotel.Models.Bookings", b =>
                 {
-                    b.HasOne("EpitomelHotel.Models.ApplUser", "ApplUser")
+                    b.HasOne("EpitomelHotel.Areas.Identity.Data.ApplUser", "ApplUser")
                         .WithMany("Bookings")
                         .HasForeignKey("ApplUserID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -576,6 +560,11 @@ namespace EpitomelHotel.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("EpitomelHotel.Areas.Identity.Data.ApplUser", b =>
+                {
+                    b.Navigation("Bookings");
+                });
+
             modelBuilder.Entity("EpitomelHotel.Models.BookingService", b =>
                 {
                     b.Navigation("Services");
@@ -586,11 +575,6 @@ namespace EpitomelHotel.Migrations
                     b.Navigation("Payments");
 
                     b.Navigation("Rooms");
-                });
-
-            modelBuilder.Entity("EpitomelHotel.Models.ApplUser", b =>
-                {
-                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("EpitomelHotel.Models.Rooms", b =>

@@ -16,11 +16,6 @@ namespace EpitomelHotel.Models
         
 
 
-        [ForeignKey("ServiceID"), Required]
-        public int ServiceID { get; set; }
-
-        [Display(Name = "Booking Service")]
-
        
 
         [ForeignKey("RoomID"), Required]

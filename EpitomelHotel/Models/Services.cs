@@ -13,9 +13,13 @@ namespace EpitomelHotel.Models
 
         [Required(ErrorMessage = "ServiceName required.")]
         public string ServiceName { get; set; }
-        
 
+        [ForeignKey("BookingServiceID"), Required]
+        public int BookingServiceID { get; set; }
 
+        [Display(Name = "Booking Service")]
+
+        public BookingService BookingService { get; set; }
 
 
 

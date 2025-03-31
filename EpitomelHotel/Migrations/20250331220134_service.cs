@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EpitomelHotel.Migrations
 {
     /// <inheritdoc />
-    public partial class staff : Migration
+    public partial class service : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -279,7 +279,6 @@ namespace EpitomelHotel.Migrations
                     BookingServiceID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ServiceCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ServiceID = table.Column<int>(type: "int", nullable: false),
                     RoomID = table.Column<int>(type: "int", nullable: false),
                     RoomsRoomID = table.Column<int>(type: "int", nullable: false)
                 },
@@ -301,7 +300,7 @@ namespace EpitomelHotel.Migrations
                     ServiceID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ServiceName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BookingServiceID = table.Column<int>(type: "int", nullable: true)
+                    BookingServiceID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -310,7 +309,8 @@ namespace EpitomelHotel.Migrations
                         name: "FK_Service_BookingService_BookingServiceID",
                         column: x => x.BookingServiceID,
                         principalTable: "BookingService",
-                        principalColumn: "BookingServiceID");
+                        principalColumn: "BookingServiceID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

@@ -116,9 +116,6 @@ namespace EpitomelHotel.Migrations
                     b.Property<decimal>("ServiceCost")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("ServiceID")
-                        .HasColumnType("int");
-
                     b.HasKey("BookingServiceID");
 
                     b.HasIndex("RoomsRoomID");
@@ -242,7 +239,7 @@ namespace EpitomelHotel.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ServiceID"));
 
-                    b.Property<int?>("BookingServiceID")
+                    b.Property<int>("BookingServiceID")
                         .HasColumnType("int");
 
                     b.Property<string>("ServiceName")
@@ -501,9 +498,13 @@ namespace EpitomelHotel.Migrations
 
             modelBuilder.Entity("EpitomelHotel.Models.Services", b =>
                 {
-                    b.HasOne("EpitomelHotel.Models.BookingService", null)
+                    b.HasOne("EpitomelHotel.Models.BookingService", "BookingService")
                         .WithMany("Services")
-                        .HasForeignKey("BookingServiceID");
+                        .HasForeignKey("BookingServiceID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BookingService");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

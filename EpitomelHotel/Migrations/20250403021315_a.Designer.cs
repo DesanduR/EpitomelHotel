@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EpitomelHotel.Migrations
 {
     [DbContext(typeof(EpitomelHotelDbContext))]
-    [Migration("20250331220134_service")]
-    partial class service
+    [Migration("20250403021315_a")]
+    partial class a
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

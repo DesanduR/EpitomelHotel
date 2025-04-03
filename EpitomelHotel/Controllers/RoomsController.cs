@@ -50,7 +50,7 @@ namespace EpitomelHotel.Controllers
         public IActionResult Create()
         {
             ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "StaffID");
-            ViewData["StatusID"] = new SelectList(_context.Set<Status>(), "StatusID", "StatusID");
+            ViewData["StatusID"] = new SelectList(_context.Status, "StatusID", "StatusID");
             return View();
         }
 
@@ -68,7 +68,7 @@ namespace EpitomelHotel.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "StaffID", rooms.StaffID);
-            ViewData["StatusID"] = new SelectList(_context.Set<Status>(), "StatusID", "StatusID", rooms.StatusID);
+            ViewData["StatusID"] = new SelectList(_context.Status, "StatusID", "StatusID", rooms.StatusID);
             return View(rooms);
         }
 
@@ -86,7 +86,7 @@ namespace EpitomelHotel.Controllers
                 return NotFound();
             }
             ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "StaffID", rooms.StaffID);
-            ViewData["StatusID"] = new SelectList(_context.Set<Status>(), "StatusID", "StatusID", rooms.StatusID);
+            ViewData["StatusID"] = new SelectList(_context.Status, "StatusID", "StatusID", rooms.StatusID);
             return View(rooms);
         }
 
@@ -123,7 +123,7 @@ namespace EpitomelHotel.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "StaffID", rooms.StaffID);
-            ViewData["StatusID"] = new SelectList(_context.Set<Status>(), "StatusID", "StatusID", rooms.StatusID);
+            ViewData["StatusID"] = new SelectList(_context.Status, "StatusID", "StatusID", rooms.StatusID);
             return View(rooms);
         }
 

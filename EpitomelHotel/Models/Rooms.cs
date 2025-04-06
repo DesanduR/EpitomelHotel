@@ -15,8 +15,8 @@ namespace EpitomelHotel.Models
         public string RoomType { get; set; }
         [Required(ErrorMessage = "Price required.")]
         public decimal Price { get; set; }
-        [Required(ErrorMessage = "Capacity required.")]
-        public string Capacity { get; set; }
+        [Required(ErrorMessage = "Capacity required 1-5 only."), Range(1,5)]
+        public int Capacity { get; set; }
 
         [ForeignKey("StatusID"), Required]
         public int StatusID { get; set; }

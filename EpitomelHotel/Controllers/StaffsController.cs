@@ -20,9 +20,15 @@ namespace EpitomelHotel.Controllers
         }
 
         // GET: Staffs
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            return View(await _context.Staff.ToListAsync());
+            var staff = from s in _context.Staff
+                           select s;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                staff = staff.Where(s => s.Firstname.Contains(searchString));
+            }
+            return View(await staff.ToListAsync());
         }
 
         // GET: Staffs/Details/5

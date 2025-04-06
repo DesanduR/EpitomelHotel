@@ -11,7 +11,7 @@ namespace EpitomelHotel.Models
 
         
 
-        [Required(ErrorMessage = "ServiceName required.")]
+        [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[a-zA-Z0-9 ]+$", ErrorMessage = "ServiceName required.")]
         public string ServiceName { get; set; }
 
         [ForeignKey("BookingServiceID"), Required]

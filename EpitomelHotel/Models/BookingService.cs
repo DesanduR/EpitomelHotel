@@ -11,7 +11,7 @@ namespace EpitomelHotel.Models
         public ICollection<Services> Services { get; set; }
         
 
-        [Required(ErrorMessage = "Service Name required.")]
+        
         public decimal ServiceCost { get; set; }
         
 

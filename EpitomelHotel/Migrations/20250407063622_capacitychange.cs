@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EpitomelHotel.Migrations
 {
     /// <inheritdoc />
-    public partial class a : Migration
+    public partial class capacitychange : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -59,10 +59,10 @@ namespace EpitomelHotel.Migrations
                 {
                     StaffID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Firstname = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Lastname = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Profession = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phonenumber = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Firstname = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Lastname = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Profession = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Phonenumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -75,7 +75,7 @@ namespace EpitomelHotel.Migrations
                 {
                     StatusID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    StatusName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    StatusName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -243,7 +243,7 @@ namespace EpitomelHotel.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RoomType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Capacity = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Capacity = table.Column<int>(type: "int", nullable: false),
                     StatusID = table.Column<int>(type: "int", nullable: false),
                     StaffID = table.Column<int>(type: "int", nullable: false),
                     BookingID = table.Column<int>(type: "int", nullable: false),
@@ -299,7 +299,7 @@ namespace EpitomelHotel.Migrations
                 {
                     ServiceID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ServiceName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ServiceName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     BookingServiceID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>

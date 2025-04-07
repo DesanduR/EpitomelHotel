@@ -49,8 +49,8 @@ namespace EpitomelHotel.Controllers
         // GET: Rooms/Create
         public IActionResult Create()
         {
-            ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "StaffID");
-            ViewData["StatusID"] = new SelectList(_context.Status, "StatusID", "StatusID");
+            ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "Firstname");
+            ViewData["StatusID"] = new SelectList(_context.Status, "StatusID", "StatusName");
             return View();
         }
 
@@ -67,8 +67,8 @@ namespace EpitomelHotel.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "StaffID", rooms.StaffID);
-            ViewData["StatusID"] = new SelectList(_context.Status, "StatusID", "StatusID", rooms.StatusID);
+            ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "Firstname", rooms.StaffID);
+            ViewData["StatusID"] = new SelectList(_context.Status, "StatusID", "StatusName", rooms.StatusID);
             return View(rooms);
         }
 
@@ -85,8 +85,8 @@ namespace EpitomelHotel.Controllers
             {
                 return NotFound();
             }
-            ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "StaffID", rooms.StaffID);
-            ViewData["StatusID"] = new SelectList(_context.Status, "StatusID", "StatusID", rooms.StatusID);
+            ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "Firstname", rooms.StaffID);
+            ViewData["StatusID"] = new SelectList(_context.Status, "StatusID", "StatusName", rooms.StatusID);
             return View(rooms);
         }
 
@@ -122,8 +122,8 @@ namespace EpitomelHotel.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "StaffID", rooms.StaffID);
-            ViewData["StatusID"] = new SelectList(_context.Status, "StatusID", "StatusID", rooms.StatusID);
+            ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "Firstname", rooms.StaffID);
+            ViewData["StatusID"] = new SelectList(_context.Status, "StatusID", "StatusName", rooms.StatusID);
             return View(rooms);
         }
 

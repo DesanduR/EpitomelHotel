@@ -14,13 +14,13 @@ public class ApplUser : IdentityUser
     public ICollection<Bookings> Bookings { get; set; }
 
 
-    [Required(ErrorMessage = "First Name required.")]
+    [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[a-zA-Z0-9 ]+$", ErrorMessage = "First Name required.")]
     public string Firstname { get; set; }
 
-    [Required(ErrorMessage = "Last Name required.")]
+    [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[a-zA-Z0-9 ]+$", ErrorMessage = "Last Name required.")]
     public string Lastname { get; set; }
 
-    [Required(ErrorMessage = "Phone Number required.")]
+    [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[a-zA-Z0-9 ]+$", ErrorMessage = "Phone Number required.")]
     public string Phone { get; set; }
 }
 

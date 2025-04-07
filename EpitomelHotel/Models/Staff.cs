@@ -11,9 +11,9 @@ namespace EpitomelHotel.Models
         public int StaffID { get; set; }
         
         public ICollection<Rooms> Rooms { get; set; }
-        [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[a-zA-Z0-9 ]+$", ErrorMessage = "Firstname required.")]
+        [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Firstname required.")]
         public string Firstname { get; set; }
-        [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[a-zA-Z0-9 ]+$", ErrorMessage = "Lastname required.")]
+        [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Lastname required.")]
         public string Lastname { get; set; }
         [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[a-zA-Z0-9 ]+$", ErrorMessage = "Profession required.")]
         public string Profession { get; set; }

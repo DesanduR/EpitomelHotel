@@ -76,13 +76,13 @@ namespace EpitomelHotel.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             /// 
-            [Required(ErrorMessage = "First Name required.")]
+            [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[a-zA-Z0-9 ]+$", ErrorMessage = "First Name required.")]
             public string Firstname { get; set; }
 
-            [Required(ErrorMessage = "Last Name required.")]
+            [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[a-zA-Z0-9 ]+$", ErrorMessage = "Last Name required.")]
             public string Lastname { get; set; }
 
-            [Required(ErrorMessage = "Phone Number required.")]
+            [Required, MinLength(1), MaxLength(20), RegularExpression(@"^\+?\d{1,3}[- ]?\(?\d{3}\)?[- ]?\d{3}[- ]?\d{4}$", ErrorMessage = "Phone Number required.")]
             public string Phone { get; set; }
 
             [Required]

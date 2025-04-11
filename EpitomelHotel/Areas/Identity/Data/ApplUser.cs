@@ -20,7 +20,7 @@ public class ApplUser : IdentityUser
     [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[a-zA-Z0-9 ]+$", ErrorMessage = "Last Name required.")]
     public string Lastname { get; set; }
 
-    [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[a-zA-Z0-9 ]+$", ErrorMessage = "Phone Number required.")]
+    [Required, MinLength(1), MaxLength(20), RegularExpression(@"^\+?\d{1,3}[- ]?\(?\d{3}\)?[- ]?\d{3}[- ]?\d{4}$", ErrorMessage = "Phone Number required.")]
     public string Phone { get; set; }
 }
 

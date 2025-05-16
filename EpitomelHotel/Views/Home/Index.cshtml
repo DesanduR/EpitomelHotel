@@ -2,19 +2,47 @@
     ViewData["Title"] = "Home Page";
 }
 
+
+
 <div class="text-center">
     <h1 class="display-4">Welcome to EpitomelHotel</h1>
-    <div class="card" style="width: 18rem;">
+    <div id="HotelImages" class="carousel slide carousel-fade" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#HotelImages" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#HotelImages" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#HotelImages" data-bs-slide-to="2"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="/Images/pol.jpeg" class="d-block mx-auto w-50" alt="Pool">
+            </div>
+            <div class="carousel-item">
+                <img src="/Images/garden.jpg" class="d-block mx-auto w-50" alt="Garden">
+            </div>
+            <div class="carousel-item">
+                <img src="/Images/lounge.jpeg" class="d-block mx-auto w-50" alt="Lounge">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#HotelImages" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#HotelImages" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+
+    <div class="card" style="width: 18rem; margin-top: 250px;">
+        <!-- Added margin-top -->
         <a asp-controller="Rooms" asp-action="Index">
             <img src="~/Images/Rooms.jpg" class="card-img-top" alt="Rooms">
         </a>
-        
-        
+
         <div class="card-body">
             <h5 class="card-title" style="color:black">Rooms</h5>
-            <p class="card-text" style="color:black" >All rooms and room types.</p>
-            <a href="#" class="btn btn-primary">View Rooms</a>
+            <p class="card-text" style="color:black">All rooms and room types.</p>
         </div>
     </div>
-    
 </div>

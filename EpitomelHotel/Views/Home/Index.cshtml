@@ -5,7 +5,14 @@
 
 
 <div class="text-center">
-    <h1 class="display-4">Welcome to EpitomelHotel</h1>
+    <style>
+        .p1 {
+            font-family:'Lucida Handwriting', cursive;
+        }
+    </style>
+
+    
+    <h1 class="p1">Welcome to EpitomelHotel</h1>
     <div id="HotelImages" class="carousel slide carousel-fade" data-bs-ride="carousel">
         <div class="carousel-indicators">
             <button type="button" data-bs-target="#HotelImages" data-bs-slide-to="0" class="active"></button>
@@ -33,21 +40,31 @@
         </button>
     </div>
 
+    <div class="container">
+        <div class="row justify-content-center" style="margin-top: 150px;">
+            <div class="card mx-3 card-hover" style="width: 18rem;">
+                <a asp-controller="Rooms" asp-action="Index">
+                    <img src="~/Images/Rooms.jpg" class="card-img-top" alt="Rooms">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title" style="color:black">Rooms</h5>
+                    <p class="card-text" style="color:black">All rooms and room types.</p>
+                </div>
+            </div>
 
-    <div class="card" style="width: 18rem; margin-top: 150px;">
-        <!-- Added margin-top -->
-        <a asp-controller="Rooms" asp-action="Index">
-            <img src="~/Images/Rooms.jpg" class="card-img-top" alt="Rooms">
-        </a>
-
-        <div class="card-body">
-            <h5 class="card-title" style="color:black">Rooms</h5>
-            <p class="card-text" style="color:black">All rooms and room types.</p>
+            <div class="card mx-3 card-hover" style="width: 18rem;">
+                <a asp-controller="Services" asp-action="Index">
+                    <img src="~/Images/bar.jpg" class="card-img-top" alt="Services">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title" style="color:black">Services</h5>
+                    <p class="card-text" style="color:black">All services we provide.</p>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="text-center">
-        <a asp-controller="Bookings" asp-action="Index" class="btn btn-primary btn-lg mt-1">Book Your Stay</a>
-    </div>
+
+    
 
 
     

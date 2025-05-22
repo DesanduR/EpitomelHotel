@@ -35,3 +35,8 @@ body {
     transform: scale(1.05);
 }
 
+/* Change the color of navbar links when hovered */
+.navbar-nav .nav-link:hover {
+    color: #f39c12 !important; 
+    background-color: transparent !important; 
+}

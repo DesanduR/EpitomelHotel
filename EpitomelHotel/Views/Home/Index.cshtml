@@ -1,17 +1,30 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-
-
-
 <div class="text-center">
     <style>
         .p1 {
-            font-family:'Lucida Handwriting', cursive;
+            font-family: 'Lucida Handwriting', cursive;
+        }
+
+        #Rooms {
+            border-radius: 25px;
+        }
+
+        .card {
+            border-radius: 15px; /* Add rounded corners to the card */
+            overflow: hidden; /* Ensure content inside the card doesn't overflow its rounded corners */
+        }
+
+        .card-img-top {
+            border-radius: 15px; /* Round all corners of the image */
+        }
+
+        .card-body {
+            padding: 15px;
         }
     </style>
 
-    
     <h1 class="p1">Welcome to EpitomelHotel</h1>
     <div id="HotelImages" class="carousel slide carousel-fade" data-bs-ride="carousel">
         <div class="carousel-indicators">
@@ -63,10 +76,4 @@
             </div>
         </div>
     </div>
-
-    
-
-
-    
-    
 </div>

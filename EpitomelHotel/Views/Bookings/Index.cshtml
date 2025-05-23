@@ -1,16 +1,15 @@
 ﻿@model IEnumerable<EpitomelHotel.Models.Bookings>
 
 @{
-    ViewData["Title"] = "Bookings";
+    ViewData["Title"] = "Index";
 }
 
-<h1>Bookings</h1>
+<h1>Index</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-
-    <table class="table table-bordered" style="color: white">
+<table class="table">
     <thead>
         <tr>
             <th>
@@ -28,7 +27,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.ApplUser)
             </th>
-            <th>Actions</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -47,7 +46,7 @@
                 @Html.DisplayFor(modelItem => item.PaymentStatus)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ApplUser.Email)
+                @Html.DisplayFor(modelItem => item.ApplUser.Id)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.BookingID">Edit</a> |

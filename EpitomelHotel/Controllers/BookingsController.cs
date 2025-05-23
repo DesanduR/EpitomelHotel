@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EpitomelHotel.Areas.Identity.Data;
 using EpitomelHotel.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace EpitomelHotel.Controllers
 {
@@ -19,7 +18,7 @@ namespace EpitomelHotel.Controllers
         {
             _context = context;
         }
-        [Authorize]
+
         // GET: Bookings
         public async Task<IActionResult> Index()
         {
@@ -49,7 +48,7 @@ namespace EpitomelHotel.Controllers
         // GET: Bookings/Create
         public IActionResult Create()
         {
-            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "ApplUserId", "Email");
+            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Id");
             return View();
         }
 
@@ -60,13 +59,13 @@ namespace EpitomelHotel.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BookingID,CheckIn,CheckOut,TotalAmount,PaymentStatus,ApplUserID")] Bookings bookings)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 _context.Add(bookings);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "ApplUserId", "Email", bookings.ApplUserID);
+            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Id", bookings.ApplUserID);
             return View(bookings);
         }
 
@@ -83,7 +82,7 @@ namespace EpitomelHotel.Controllers
             {
                 return NotFound();
             }
-            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "ApplUserId", "Email", bookings.ApplUserID);
+            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Id", bookings.ApplUserID);
             return View(bookings);
         }
 
@@ -99,7 +98,7 @@ namespace EpitomelHotel.Controllers
                 return NotFound();
             }
 
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {
@@ -119,7 +118,7 @@ namespace EpitomelHotel.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "ApplUserId", "Email", bookings.ApplUserID);
+            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Id", bookings.ApplUserID);
             return View(bookings);
         }
 

@@ -1,5 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EpitomelHotel.Models
 {
@@ -9,29 +10,34 @@ namespace EpitomelHotel.Models
         [Required(ErrorMessage = "RoomID required.")]
         public int RoomID { get; set; }
 
-        public ICollection<BookingService>BookingServices { get; set; }
+        // One Room has many BookingServices
+        public virtual ICollection<BookingService> BookingServices { get; set; }
 
         [Required(ErrorMessage = "RoomType required.")]
         public string RoomType { get; set; }
+
         [Required(ErrorMessage = "Price required.")]
         public decimal Price { get; set; }
-        [Required(ErrorMessage = "Capacity required 1-5 only."), Range(1,5)]
+
+        [Required(ErrorMessage = "Capacity required 1-5 only.")]
+        [Range(1, 5)]
         public int Capacity { get; set; }
 
-        [ForeignKey("StatusID"), Required]
+        [Required]
         public int StatusID { get; set; }
+
         [Display(Name = "Room Status")]
-        public Status Status { get; set; }
+        public virtual Status Status { get; set; }
 
-        [ForeignKey("StaffID"), Required]
+        [Required]
         public int StaffID { get; set; }
+
         [Display(Name = "StaffID")]
-        public Staff Staff { get; set; }
+        public virtual Staff Staff { get; set; }
 
-
-        [ForeignKey("BookingID"), Required]
+        [Required]
         public int BookingID { get; set; }
-        [Display(Name = "Payements")]
-        public Bookings Bookings { get; set; }
+
+        public virtual Bookings Booking { get; set; }
     }
 }

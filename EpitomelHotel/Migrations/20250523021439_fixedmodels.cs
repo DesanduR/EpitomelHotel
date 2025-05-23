@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EpitomelHotel.Migrations
 {
     /// <inheritdoc />
-    public partial class capacitychange : Migration
+    public partial class fixedmodels : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,9 +30,9 @@ namespace EpitomelHotel.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Firstname = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Lastname = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Firstname = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Lastname = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -221,15 +221,14 @@ namespace EpitomelHotel.Migrations
                     PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    BookingID = table.Column<int>(type: "int", nullable: false),
-                    BookingsBookingID = table.Column<int>(type: "int", nullable: false)
+                    BookingID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Payments", x => x.PaymentID);
                     table.ForeignKey(
-                        name: "FK_Payments_Booking_BookingsBookingID",
-                        column: x => x.BookingsBookingID,
+                        name: "FK_Payments_Booking_BookingID",
+                        column: x => x.BookingID,
                         principalTable: "Booking",
                         principalColumn: "BookingID",
                         onDelete: ReferentialAction.Cascade);
@@ -246,15 +245,14 @@ namespace EpitomelHotel.Migrations
                     Capacity = table.Column<int>(type: "int", nullable: false),
                     StatusID = table.Column<int>(type: "int", nullable: false),
                     StaffID = table.Column<int>(type: "int", nullable: false),
-                    BookingID = table.Column<int>(type: "int", nullable: false),
-                    BookingsBookingID = table.Column<int>(type: "int", nullable: false)
+                    BookingID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Rooms", x => x.RoomID);
                     table.ForeignKey(
-                        name: "FK_Rooms_Booking_BookingsBookingID",
-                        column: x => x.BookingsBookingID,
+                        name: "FK_Rooms_Booking_BookingID",
+                        column: x => x.BookingID,
                         principalTable: "Booking",
                         principalColumn: "BookingID",
                         onDelete: ReferentialAction.Cascade);
@@ -279,15 +277,14 @@ namespace EpitomelHotel.Migrations
                     BookingServiceID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ServiceCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    RoomID = table.Column<int>(type: "int", nullable: false),
-                    RoomsRoomID = table.Column<int>(type: "int", nullable: false)
+                    RoomID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_BookingService", x => x.BookingServiceID);
                     table.ForeignKey(
-                        name: "FK_BookingService_Rooms_RoomsRoomID",
-                        column: x => x.RoomsRoomID,
+                        name: "FK_BookingService_Rooms_RoomID",
+                        column: x => x.RoomID,
                         principalTable: "Rooms",
                         principalColumn: "RoomID",
                         onDelete: ReferentialAction.Cascade);
@@ -358,19 +355,19 @@ namespace EpitomelHotel.Migrations
                 column: "ApplUserID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BookingService_RoomsRoomID",
+                name: "IX_BookingService_RoomID",
                 table: "BookingService",
-                column: "RoomsRoomID");
+                column: "RoomID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Payments_BookingsBookingID",
+                name: "IX_Payments_BookingID",
                 table: "Payments",
-                column: "BookingsBookingID");
+                column: "BookingID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Rooms_BookingsBookingID",
+                name: "IX_Rooms_BookingID",
                 table: "Rooms",
-                column: "BookingsBookingID");
+                column: "BookingID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Rooms_StaffID",

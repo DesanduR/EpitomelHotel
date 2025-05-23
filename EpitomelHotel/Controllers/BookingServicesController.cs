@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EpitomelHotel.Areas.Identity.Data;
 using EpitomelHotel.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace EpitomelHotel.Controllers
 {
@@ -19,12 +18,12 @@ namespace EpitomelHotel.Controllers
         {
             _context = context;
         }
-        [Authorize]
 
         // GET: BookingServices
         public async Task<IActionResult> Index()
         {
-            return View(await _context.BookingService.ToListAsync());
+            var epitomelHotelDbContext = _context.BookingService.Include(b => b.Room);
+            return View(await epitomelHotelDbContext.ToListAsync());
         }
 
         // GET: BookingServices/Details/5
@@ -36,6 +35,7 @@ namespace EpitomelHotel.Controllers
             }
 
             var bookingService = await _context.BookingService
+                .Include(b => b.Room)
                 .FirstOrDefaultAsync(m => m.BookingServiceID == id);
             if (bookingService == null)
             {
@@ -48,6 +48,7 @@ namespace EpitomelHotel.Controllers
         // GET: BookingServices/Create
         public IActionResult Create()
         {
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType");
             return View();
         }
 
@@ -58,12 +59,13 @@ namespace EpitomelHotel.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BookingServiceID,ServiceCost,RoomID")] BookingService bookingService)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 _context.Add(bookingService);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookingService.RoomID);
             return View(bookingService);
         }
 
@@ -80,6 +82,7 @@ namespace EpitomelHotel.Controllers
             {
                 return NotFound();
             }
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookingService.RoomID);
             return View(bookingService);
         }
 
@@ -95,7 +98,7 @@ namespace EpitomelHotel.Controllers
                 return NotFound();
             }
 
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {
@@ -115,6 +118,7 @@ namespace EpitomelHotel.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookingService.RoomID);
             return View(bookingService);
         }
 
@@ -127,6 +131,7 @@ namespace EpitomelHotel.Controllers
             }
 
             var bookingService = await _context.BookingService
+                .Include(b => b.Room)
                 .FirstOrDefaultAsync(m => m.BookingServiceID == id);
             if (bookingService == null)
             {

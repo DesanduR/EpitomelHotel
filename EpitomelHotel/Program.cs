@@ -6,7 +6,9 @@ var connectionString = builder.Configuration.GetConnectionString("EpitomelHotelD
 
 builder.Services.AddDbContext<EpitomelHotelDbContext>(options => options.UseSqlServer(connectionString));
 
-builder.Services.AddDefaultIdentity<ApplUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<EpitomelHotelDbContext>();
+builder.Services.AddDefaultIdentity<ApplUser>(options => options.SignIn.RequireConfirmedAccount = false)
+.AddRoles<IdentityRole>()
+.AddEntityFrameworkStores<EpitomelHotelDbContext>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -33,4 +35,38 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
+
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var roles = new[] { "Admin", "User" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+            await roleManager.CreateAsync(new IdentityRole(role));
+
+    }
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplUser>>();
+
+    string adminEmail = "admin@gmail.com";
+    string adminPassword = "Password123!";
+
+    if (await userManager.FindByEmailAsync(adminEmail) == null)
+    {
+        var user = new ApplUser();
+        user.UserName = adminEmail;
+        user.Email = adminEmail;
+        user.Firstname = "Test";
+        user.Lastname = "Admin";
+        user.Phone = "1234567890";
+
+        await userManager.CreateAsync(user, adminPassword);
+        await userManager.AddToRoleAsync(user, "Admin");
+    }
+}
 app.Run();

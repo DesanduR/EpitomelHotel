@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Create";
+    DateTime min = DateTime.Now;
 }
 
 <h1>Create</h1>
@@ -13,30 +14,36 @@
         <form asp-action="Create" method="post">
             @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <div class="form-group">
                 <label asp-for="CheckIn" class="control-label"></label>
-                <input asp-for="CheckIn" class="form-control" />
+                <input asp-for="CheckIn" class="form-control" type="date" id="checkin-date" min="@min.ToString("yyyy-MM-dd")" />
                 <span asp-validation-for="CheckIn" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="CheckOut" class="control-label"></label>
-                <input asp-for="CheckOut" class="form-control" />
-                <span asp-validation-for="CheckOut" class="text-danger"></span>
+                <input asp-for="CheckOut" class="form-control" type="date" id="checkout-date" min="@min.ToString("yyyy-MM-dd")" />
+                <span asp-validation-for="CheckOut" class="text-danger" id="checkout-error"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="TotalAmount" class="control-label"></label>
                 <input asp-for="TotalAmount" class="form-control" />
                 <span asp-validation-for="TotalAmount" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="PaymentStatus" class="control-label"></label>
                 <input asp-for="PaymentStatus" class="form-control" />
                 <span asp-validation-for="PaymentStatus" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="ApplUserID" class="control-label"></label>
-                <select asp-for="ApplUserID" class ="form-control" asp-items="ViewBag.ApplUserID"></select>
+                <select asp-for="ApplUserID" class="form-control" asp-items="ViewBag.ApplUserID"></select>
             </div>
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
@@ -44,10 +51,49 @@
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
+@if (User.IsInRole("Admin"))
+{
+    <div>
+        <a asp-action="Index">Back to List</a>
+    </div>
+}
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const checkInInput = document.getElementById("checkin-date");
+            const checkOutInput = document.getElementById("checkout-date");
+            const checkOutError = document.getElementById("checkout-error");
+
+            function validateDates() {
+                const checkIn = new Date(checkInInput.value);
+                const checkOut = new Date(checkOutInput.value);
+
+                if (checkInInput.value && checkOutInput.value) {
+                    if (checkOut <= checkIn) {
+                        checkOutInput.setCustomValidity("Check-out must be after check-in.");
+                        checkOutError.innerText = "Check-out must be after check-in.";
+                    } else {
+                        checkOutInput.setCustomValidity("");
+                        checkOutError.innerText = "";
+                    }
+                }
+            }
+
+            checkInInput.addEventListener("change", function () {
+                if (checkInInput.value) {
+                    const minDate = new Date(checkInInput.value);
+                    minDate.setDate(minDate.getDate() + 1);
+                    checkOutInput.min = minDate.toISOString().split("T")[0];
+                }
+                validateDates();
+            });
+
+            checkOutInput.addEventListener("change", validateDates);
+        });
+    </script>
 }

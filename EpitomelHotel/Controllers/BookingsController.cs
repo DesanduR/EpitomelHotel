@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EpitomelHotel.Areas.Identity.Data;
 using EpitomelHotel.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EpitomelHotel.Controllers
 {
@@ -19,6 +20,7 @@ namespace EpitomelHotel.Controllers
             _context = context;
         }
 
+        
         // GET: Bookings
         public async Task<IActionResult> Index()
         {
@@ -45,8 +47,10 @@ namespace EpitomelHotel.Controllers
             return View(bookings);
         }
 
+        [Authorize]
         // GET: Bookings/Create
         public IActionResult Create()
+
         {
             ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Id");
             return View();

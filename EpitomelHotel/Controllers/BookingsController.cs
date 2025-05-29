@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using EpitomelHotel.Areas.Identity.Data;
 using EpitomelHotel.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace EpitomelHotel.Controllers
 {
@@ -23,10 +24,23 @@ namespace EpitomelHotel.Controllers
         
         // GET: Bookings
         public async Task<IActionResult> Index()
+
         {
-            var epitomelHotelDbContext = _context.Bookings.Include(b => b.ApplUser);
-            return View(await epitomelHotelDbContext.ToListAsync());
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            IQueryable<Bookings> bookingsQuery = _context.Bookings
+                .Include(b => b.ApplUser)
+                .Include(b => b.Rooms);
+
+            if (!User.IsInRole("Admin"))
+            {
+                //Filter bookings for non-admin users to only see their own bookings
+                bookingsQuery = bookingsQuery.Where(b => b.ApplUserID == userId);
+            }
+            var bookings = await bookingsQuery.ToListAsync();
+            return View(bookings);
         }
+
 
         // GET: Bookings/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -63,6 +77,9 @@ namespace EpitomelHotel.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BookingID,CheckIn,CheckOut,TotalAmount,PaymentStatus,ApplUserID")] Bookings bookings)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            bookings.ApplUserID = userId;
+
             if (!ModelState.IsValid)
             {
                 _context.Add(bookings);

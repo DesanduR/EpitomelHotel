@@ -36,6 +36,7 @@ namespace EpitomelHotel.Models
         public string ApplUserID { get; set; }
 
         [Display(Name = "ApplUser Name")]
+        // Enable lazy loading
         public virtual ApplUser ApplUser { get; set; }
     }
 }

@@ -21,10 +21,8 @@ namespace EpitomelHotel.Controllers
             _context = context;
         }
 
-        
         // GET: Bookings
-        public async Task<IActionResult> Index()
-
+        public async Task<IActionResult> Index(string searchString)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -34,13 +32,21 @@ namespace EpitomelHotel.Controllers
 
             if (!User.IsInRole("Admin"))
             {
-                //Filter bookings for non-admin users to only see their own bookings
+                // Non-admins can only view their own bookings
                 bookingsQuery = bookingsQuery.Where(b => b.ApplUserID == userId);
             }
+
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                string lowerSearch = searchString.ToLower();
+                bookingsQuery = bookingsQuery.Where(b =>
+                    (b.ApplUser.Firstname != null && b.ApplUser.Firstname.ToLower().Contains(lowerSearch)) ||
+                    (b.PaymentStatus != null && b.PaymentStatus.ToLower().Contains(lowerSearch)));
+            }
+
             var bookings = await bookingsQuery.ToListAsync();
             return View(bookings);
         }
-
 
         // GET: Bookings/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -64,15 +70,12 @@ namespace EpitomelHotel.Controllers
         [Authorize]
         // GET: Bookings/Create
         public IActionResult Create()
-
         {
-            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Id");
+            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Firstname");
             return View();
         }
 
         // POST: Bookings/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BookingID,CheckIn,CheckOut,TotalAmount,PaymentStatus,ApplUserID")] Bookings bookings)
@@ -108,8 +111,6 @@ namespace EpitomelHotel.Controllers
         }
 
         // POST: Bookings/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("BookingID,CheckIn,CheckOut,TotalAmount,PaymentStatus,ApplUserID")] Bookings bookings)

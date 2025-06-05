@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EpitomelHotel.Areas.Identity.Data;
 using EpitomelHotel.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace EpitomelHotel.Controllers
 {
@@ -19,18 +18,11 @@ namespace EpitomelHotel.Controllers
         {
             _context = context;
         }
-        
 
         // GET: Staffs
-        public async Task<IActionResult> Index(string searchString)
+        public async Task<IActionResult> Index()
         {
-            var staff = from s in _context.Staff
-                           select s;
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                staff = staff.Where(s => s.Firstname.Contains(searchString));
-            }
-            return View(await staff.ToListAsync());
+            return View(await _context.Staff.ToListAsync());
         }
 
         // GET: Staffs/Details/5

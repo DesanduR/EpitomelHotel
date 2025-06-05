@@ -22,7 +22,7 @@ namespace EpitomelHotel.Controllers
         // GET: Rooms
         public async Task<IActionResult> Index()
         {
-            var epitomelHotelDbContext = _context.Rooms.Include(r => r.Booking).Include(r => r.Staff).Include(r => r.Status);
+            var epitomelHotelDbContext = _context.Rooms.Include(r => r.Status);
             return View(await epitomelHotelDbContext.ToListAsync());
         }
 
@@ -35,8 +35,6 @@ namespace EpitomelHotel.Controllers
             }
 
             var rooms = await _context.Rooms
-                .Include(r => r.Booking)
-                .Include(r => r.Staff)
                 .Include(r => r.Status)
                 .FirstOrDefaultAsync(m => m.RoomID == id);
             if (rooms == null)
@@ -50,8 +48,6 @@ namespace EpitomelHotel.Controllers
         // GET: Rooms/Create
         public IActionResult Create()
         {
-            ViewData["BookingID"] = new SelectList(_context.Bookings, "BookingID", "ApplUserID");
-            ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "Firstname");
             ViewData["StatusID"] = new SelectList(_context.Status, "StatusID", "StatusName");
             return View();
         }
@@ -61,16 +57,14 @@ namespace EpitomelHotel.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("RoomID,RoomType,Price,Capacity,StatusID,StaffID,BookingID")] Rooms rooms)
+        public async Task<IActionResult> Create([Bind("RoomID,RoomType,Price,Capacity,StatusID")] Rooms rooms)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 _context.Add(rooms);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BookingID"] = new SelectList(_context.Bookings, "BookingID", "ApplUserID", rooms.BookingID);
-            ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "Firstname", rooms.StaffID);
             ViewData["StatusID"] = new SelectList(_context.Status, "StatusID", "StatusName", rooms.StatusID);
             return View(rooms);
         }
@@ -88,8 +82,6 @@ namespace EpitomelHotel.Controllers
             {
                 return NotFound();
             }
-            ViewData["BookingID"] = new SelectList(_context.Bookings, "BookingID", "ApplUserID", rooms.BookingID);
-            ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "Firstname", rooms.StaffID);
             ViewData["StatusID"] = new SelectList(_context.Status, "StatusID", "StatusName", rooms.StatusID);
             return View(rooms);
         }
@@ -99,14 +91,14 @@ namespace EpitomelHotel.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("RoomID,RoomType,Price,Capacity,StatusID,StaffID,BookingID")] Rooms rooms)
+        public async Task<IActionResult> Edit(int id, [Bind("RoomID,RoomType,Price,Capacity,StatusID")] Rooms rooms)
         {
             if (id != rooms.RoomID)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 try
                 {
@@ -126,8 +118,6 @@ namespace EpitomelHotel.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BookingID"] = new SelectList(_context.Bookings, "BookingID", "ApplUserID", rooms.BookingID);
-            ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "Firstname", rooms.StaffID);
             ViewData["StatusID"] = new SelectList(_context.Status, "StatusID", "StatusName", rooms.StatusID);
             return View(rooms);
         }
@@ -141,8 +131,6 @@ namespace EpitomelHotel.Controllers
             }
 
             var rooms = await _context.Rooms
-                .Include(r => r.Booking)
-                .Include(r => r.Staff)
                 .Include(r => r.Status)
                 .FirstOrDefaultAsync(m => m.RoomID == id);
             if (rooms == null)

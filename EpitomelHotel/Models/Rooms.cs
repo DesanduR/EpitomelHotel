@@ -12,6 +12,7 @@ namespace EpitomelHotel.Models
 
         // One Room has many BookingServices
         public virtual ICollection<BookingService> BookingServices { get; set; }
+        public virtual ICollection<Bookings> Booking { get; set; }
 
         [Required(ErrorMessage = "RoomType required.")]
         public string RoomType { get; set; }
@@ -29,15 +30,7 @@ namespace EpitomelHotel.Models
         [Display(Name = "Room Status")]
         public virtual Status Status { get; set; }
 
-        [Required]
-        public int StaffID { get; set; }
-
-        [Display(Name = "StaffID")]
-        public virtual Staff Staff { get; set; }
-
-        [Required]
-        public int BookingID { get; set; }
-
-        public virtual Bookings Booking { get; set; }
+        
+    
     }
 }

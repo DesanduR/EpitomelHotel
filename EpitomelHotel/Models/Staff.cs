@@ -10,7 +10,7 @@ namespace EpitomelHotel.Models
         [Required(ErrorMessage = "StaffID required.")]
         public int StaffID { get; set; }
         
-        public ICollection<Rooms> Rooms { get; set; }
+        
         [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[A-Z][a-z\s]*$", ErrorMessage = "Firstname required.")]
         public string Firstname { get; set; }
         [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[A-Z][a-z\s]*$", ErrorMessage = "Lastname required.")]

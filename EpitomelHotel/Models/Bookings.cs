@@ -12,8 +12,7 @@ namespace EpitomelHotel.Models
        
         public int BookingID { get; set; }
 
-        // One Booking has many Rooms
-        public virtual ICollection<Rooms> Rooms { get; set; }
+        
 
         // One Booking has many Payments
         public virtual ICollection<Payments> Payments { get; set; }
@@ -31,6 +30,14 @@ namespace EpitomelHotel.Models
 
         public string PaymentStatus { get; set; }
 
+        [Required]
+        [ForeignKey("Room")]
+        public int RoomID { get; set; }
+
+        [Display(Name = "Room Type")]
+        public virtual Rooms Room { get; set; }
+
+       
         [Required]
         [ForeignKey("ApplUser")]
         public string ApplUserID { get; set; }

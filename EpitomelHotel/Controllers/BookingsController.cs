@@ -28,7 +28,7 @@ namespace EpitomelHotel.Controllers
 
             IQueryable<Bookings> bookingsQuery = _context.Bookings
                 .Include(b => b.ApplUser)
-                .Include(b => b.Rooms);
+                .Include(b => b.Room); // Fixed from Rooms to Room (original navigation property)
 
             if (!User.IsInRole("Admin"))
             {
@@ -58,7 +58,9 @@ namespace EpitomelHotel.Controllers
 
             var bookings = await _context.Bookings
                 .Include(b => b.ApplUser)
+                .Include(b => b.Room) // Include Room here for consistency and completeness
                 .FirstOrDefaultAsync(m => m.BookingID == id);
+
             if (bookings == null)
             {
                 return NotFound();
@@ -71,6 +73,8 @@ namespace EpitomelHotel.Controllers
         // GET: Bookings/Create
         public IActionResult Create()
         {
+
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType");
             ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Firstname");
             return View();
         }
@@ -78,19 +82,22 @@ namespace EpitomelHotel.Controllers
         // POST: Bookings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BookingID,CheckIn,CheckOut,TotalAmount,PaymentStatus,ApplUserID")] Bookings bookings)
+        public async Task<IActionResult> Create([Bind("BookingID,CheckIn,CheckOut,TotalAmount,PaymentStatus,RoomID")] Bookings bookings)
+
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            bookings.ApplUserID = userId;
+            bookings.ApplUserID = userId; // Assign current user ID
 
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 _context.Add(bookings);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Id", bookings.ApplUserID);
-            return View(bookings);
+
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType");
+            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Firstname");
+            return View();
         }
 
         // GET: Bookings/Edit/5
@@ -120,7 +127,7 @@ namespace EpitomelHotel.Controllers
                 return NotFound();
             }
 
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {
@@ -154,6 +161,7 @@ namespace EpitomelHotel.Controllers
 
             var bookings = await _context.Bookings
                 .Include(b => b.ApplUser)
+                .Include(b => b.Room) // Include Room on delete details view as well
                 .FirstOrDefaultAsync(m => m.BookingID == id);
             if (bookings == null)
             {

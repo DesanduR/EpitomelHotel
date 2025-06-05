@@ -88,7 +88,7 @@ namespace EpitomelHotel.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             bookings.ApplUserID = userId; // Assign current user ID
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 _context.Add(bookings);
                 await _context.SaveChangesAsync();
@@ -127,7 +127,7 @@ namespace EpitomelHotel.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 try
                 {

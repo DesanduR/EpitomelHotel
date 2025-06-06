@@ -4,13 +4,13 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Booking</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a class="btn btn-primary" asp-action="Create">Create New</a>
 </p>
 <form asp-action="Index" method="get">
-    
+
     <div class="form-actions no-color">
 
 
@@ -21,6 +21,15 @@
         </p>
     </div>
 </form>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        You have no bookings with this name
+    </div>
+}
+else{
+
 <table class="table table-bordered" style="color: white">
     <thead>
         <tr>
@@ -42,7 +51,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.ApplUser)
             </th>
-            <th></th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -67,11 +76,12 @@
                 @Html.DisplayFor(modelItem => item.ApplUser.Firstname)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.BookingID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.BookingID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.BookingID">Delete</a>
+                    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.BookingID">Edit</a> 
+                    <a class="btn btn-info" asp-action="Details" asp-route-id="@item.BookingID">Details</a> 
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.BookingID">Delete</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
+}

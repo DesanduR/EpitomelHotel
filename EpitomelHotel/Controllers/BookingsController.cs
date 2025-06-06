@@ -92,13 +92,47 @@ namespace EpitomelHotel.Controllers
             {
                 _context.Add(bookings);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Confirmation), new { id = bookings.BookingID });
+
             }
 
             ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType");
             ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Firstname");
             return View();
         }
+
+        [Authorize]
+        public async Task<IActionResult> RedirectToMyBookings()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var hasBookings = await _context.Bookings
+                .AnyAsync(b => b.ApplUserID == userId);
+
+            if (hasBookings)
+                return RedirectToAction(nameof(Index));
+            else
+                return RedirectToAction(nameof(Create));
+        }
+
+
+        // GET: Bookings/Confirmation/5
+        public async Task<IActionResult> Confirmation(int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            var booking = await _context.Bookings
+                .Include(b => b.Room)
+                .Include(b => b.ApplUser)
+                .FirstOrDefaultAsync(b => b.BookingID == id);
+
+            if (booking == null)
+                return NotFound();
+
+            return View(booking);
+        }
+    
 
         // GET: Bookings/Edit/5
         public async Task<IActionResult> Edit(int? id)

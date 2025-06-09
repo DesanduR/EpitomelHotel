@@ -51,6 +51,24 @@ body {
     opacity: 100% !important;
 }
 
-.paginglink {
-    border-color: white;
+.pagination-container {
+    background-color: #222;
+    padding: 1rem;
+    border-radius: 0.5rem;
 }
+
+.btn-outline-light.disabled, .btn-outline-light:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-outline-light {
+    color: #f8f9fa;
+    border-color: #f8f9fa;
+}
+
+    .btn-outline-light:hover {
+        background-color: #f8f9fa;
+        color: #212529;
+    }
+

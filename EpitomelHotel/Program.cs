@@ -53,7 +53,7 @@ using (var scope = app.Services.CreateScope())
 {
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplUser>>();
 
-    string adminEmail = "admin@emitomelhotel.com";
+    string adminEmail = "admin@epitomelhotel.com";
     string adminPassword = "Password123!";
 
     if (await userManager.FindByEmailAsync(adminEmail) == null)

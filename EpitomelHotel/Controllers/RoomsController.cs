@@ -32,9 +32,8 @@ namespace EpitomelHotel.Controllers
             {
                 searchString = currentFilter;
             }
+            var rooms = _context.Rooms.Include(r => r.Status).AsQueryable();
 
-            var rooms = from r in _context.Rooms
-                           select r;
             if (!String.IsNullOrEmpty(searchString))
             {
                 rooms = rooms.Where(s => s.RoomType.Contains(searchString));

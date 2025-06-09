@@ -1,4 +1,5 @@
-﻿@model IEnumerable<EpitomelHotel.Models.Bookings>
+﻿@using EpitomelHotel.Models;
+@model PaginatedList<EpitomelHotel.Models.Bookings>
 
 @{
     ViewData["Title"] = "Index";
@@ -34,22 +35,22 @@ else{
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.CheckIn)
+                CheckIn
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CheckOut)
+                CheckOut
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TotalAmount)
+                TotalAmount
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PaymentStatus)
+                PaymentStatus
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Room)
+                Room
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ApplUser)
+                ApplUser
             </th>
             <th>Actions</th>
         </tr>
@@ -85,3 +86,28 @@ else{
     </tbody>
 </table>
 }
+      
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<div class="pagination-container mt-4 d-flex justify-content-center">
+    <a asp-action="Index"
+       asp-route-sortOrder="@ViewData["CurrentSort"]"
+       asp-route-pageNumber="@(Model.PageIndex - 1)"
+       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       class="btn btn-outline-light me-2 @prevDisabled">
+        <i class="bi bi-arrow-left-circle-fill"></i> Previous
+    </a>
+
+    <span class="text-light align-self-center">Page @Model.PageIndex of @Model.TotalPages</span>
+
+    <a asp-action="Index"
+       asp-route-sortOrder="@ViewData["CurrentSort"]"
+       asp-route-pageNumber="@(Model.PageIndex + 1)"
+       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       class="btn btn-outline-light ms-2 @nextDisabled">
+        Next <i class="bi bi-arrow-right-circle-fill"></i>
+    </a>
+</div>

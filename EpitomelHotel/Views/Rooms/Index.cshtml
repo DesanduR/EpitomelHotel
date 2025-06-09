@@ -51,9 +51,11 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Capacity)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
+            @if (User.Identity.IsAuthenticated)
+                <td>
+                    @item.Status?.StatusName
+                </td>
+
             <td>
                     <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.RoomID">Edit</a> |
                     <a class="btn btn-info" asp-action="Details" asp-route-id="@item.RoomID">Details</a> |
@@ -69,17 +71,22 @@
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
 
-<a class = "paginglink" asp-action="Index"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.PageIndex - 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-primary @prevDisabled">
-    Previous
-</a>
-<a class="paginglink" asp-action="Index"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.PageIndex + 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-primary @nextDisabled">
-    Next
-</a>
+<div class="pagination-container mt-4 d-flex justify-content-center">
+    <a asp-action="Index"
+       asp-route-sortOrder="@ViewData["CurrentSort"]"
+       asp-route-pageNumber="@(Model.PageIndex - 1)"
+       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       class="btn btn-outline-light me-2 @prevDisabled">
+        <i class="bi bi-arrow-left-circle-fill"></i> Previous
+    </a>
+
+    <span class="text-light align-self-center">Page @Model.PageIndex of @Model.TotalPages</span>
+
+    <a asp-action="Index"
+       asp-route-sortOrder="@ViewData["CurrentSort"]"
+       asp-route-pageNumber="@(Model.PageIndex + 1)"
+       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       class="btn btn-outline-light ms-2 @nextDisabled">
+        Next <i class="bi bi-arrow-right-circle-fill"></i>
+    </a>
+</div>

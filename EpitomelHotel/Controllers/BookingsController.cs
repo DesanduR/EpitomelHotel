@@ -22,31 +22,36 @@ namespace EpitomelHotel.Controllers
         }
 
         // GET: Bookings
-        public async Task<IActionResult> Index(string searchString)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        public async Task<IActionResult> Index(string searchString, int? pageNumber, int pageSize = 5)
+{
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            IQueryable<Bookings> bookingsQuery = _context.Bookings
-                .Include(b => b.ApplUser)
-                .Include(b => b.Room); // Fixed from Rooms to Room (original navigation property)
+    IQueryable<Bookings> bookingsQuery = _context.Bookings
+        .Include(b => b.ApplUser)
+        .Include(b => b.Room);
 
-            if (!User.IsInRole("Admin"))
-            {
-                // Non-admins can only view their own bookings
-                bookingsQuery = bookingsQuery.Where(b => b.ApplUserID == userId);
-            }
+    if (!User.IsInRole("Admin"))
+    {
+        bookingsQuery = bookingsQuery.Where(b => b.ApplUserID == userId);
+    }
 
-            if (!string.IsNullOrWhiteSpace(searchString))
-            {
-                string lowerSearch = searchString.ToLower();
-                bookingsQuery = bookingsQuery.Where(b =>
-                    (b.ApplUser.Firstname != null && b.ApplUser.Firstname.ToLower().Contains(lowerSearch)) ||
-                    (b.PaymentStatus != null && b.PaymentStatus.ToLower().Contains(lowerSearch)));
-            }
+    if (!string.IsNullOrWhiteSpace(searchString))
+    {
+        string lowerSearch = searchString.ToLower();
+        bookingsQuery = bookingsQuery.Where(b =>
+            (b.ApplUser.Firstname != null && b.ApplUser.Firstname.ToLower().Contains(lowerSearch)) ||
+            (b.PaymentStatus != null && b.PaymentStatus.ToLower().Contains(lowerSearch)));
+    }
 
-            var bookings = await bookingsQuery.ToListAsync();
-            return View(bookings);
-        }
+    // Use the PaginatedList helper class to paginate results
+    var paginatedBookings = await PaginatedList<Bookings>.CreateAsync(bookingsQuery.AsNoTracking(), pageNumber ?? 1, pageSize);
+
+    // Pass the search string to the ViewData so the view can keep it in the search box
+    ViewData["CurrentFilter"] = searchString;
+
+    return View(paginatedBookings);
+}
+
 
         // GET: Bookings/Details/5
         public async Task<IActionResult> Details(int? id)

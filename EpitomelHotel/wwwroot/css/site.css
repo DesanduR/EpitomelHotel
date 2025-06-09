@@ -40,3 +40,17 @@ body {
     color: #f39c12 !important; 
     background-color: transparent !important; 
 }
+
+.loginlinks {
+    color:white !important;
+    opacity:75% !important;
+    transition: all 1s ease 0s !important;
+}
+
+.loginlinks:hover {
+    opacity: 100% !important;
+}
+
+.paginglink {
+    border-color: white;
+}

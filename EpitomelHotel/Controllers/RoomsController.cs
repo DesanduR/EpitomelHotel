@@ -20,10 +20,27 @@ namespace EpitomelHotel.Controllers
         }
 
         // GET: Rooms
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
         {
-            var epitomelHotelDbContext = _context.Rooms.Include(r => r.Status);
-            return View(await epitomelHotelDbContext.ToListAsync());
+            ViewData["CurrentSort"] = sortOrder;
+
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            var rooms = from r in _context.Rooms
+                           select r;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                rooms = rooms.Where(s => s.RoomType.Contains(searchString));
+            }
+            int pageSize = 5;
+            return View(await PaginatedList<Rooms>.CreateAsync(rooms.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
         // GET: Rooms/Details/5

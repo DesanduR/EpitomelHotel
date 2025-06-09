@@ -105,14 +105,20 @@ namespace EpitomelHotel.Controllers
         public async Task<IActionResult> RedirectToMyBookings()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            var hasBookings = await _context.Bookings
-                .AnyAsync(b => b.ApplUserID == userId);
-
-            if (hasBookings)
+            if (User.IsInRole("Admin"))
+            {
                 return RedirectToAction(nameof(Index));
+            }
             else
-                return RedirectToAction(nameof(Create));
+            {
+                var hasBookings = await _context.Bookings
+                    .AnyAsync(b => b.ApplUserID == userId);
+
+                if (hasBookings)
+                    return RedirectToAction(nameof(Index));
+                else
+                    return RedirectToAction(nameof(Create));
+            }
         }
 
 

@@ -29,16 +29,18 @@
 
             <div class="form-group">
                 <label asp-for="TotalAmount" class="control-label"></label>
-                <input asp-for="TotalAmount" class="form-control" />
+                <input asp-for="TotalAmount" class="form-control" id="total-amount" readonly />
                 <span asp-validation-for="TotalAmount" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="PaymentStatus" class="control-label"></label>
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="form-group">
+                    <label asp-for="PaymentStatus" class="control-label"></label>
                 <input asp-for="PaymentStatus" class="form-control" />
                 <span asp-validation-for="PaymentStatus" class="text-danger"></span>
             </div>
-
+            }
             <div class="form-group">
                 <label asp-for="RoomID" class="control-label">Room Type</label>
                 <select asp-for="RoomID" class="form-control" asp-items="ViewBag.RoomID"></select>

@@ -23,35 +23,32 @@ namespace EpitomelHotel.Controllers
 
         // GET: Bookings
         public async Task<IActionResult> Index(string searchString, int? pageNumber, int pageSize = 5)
-{
-    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-    IQueryable<Bookings> bookingsQuery = _context.Bookings
-        .Include(b => b.ApplUser)
-        .Include(b => b.Room);
+            IQueryable<Bookings> bookingsQuery = _context.Bookings
+                .Include(b => b.ApplUser)
+                .Include(b => b.Room);
 
-    if (!User.IsInRole("Admin"))
-    {
-        bookingsQuery = bookingsQuery.Where(b => b.ApplUserID == userId);
-    }
+            if (!User.IsInRole("Admin"))
+            {
+                bookingsQuery = bookingsQuery.Where(b => b.ApplUserID == userId);
+            }
 
-    if (!string.IsNullOrWhiteSpace(searchString))
-    {
-        string lowerSearch = searchString.ToLower();
-        bookingsQuery = bookingsQuery.Where(b =>
-            (b.ApplUser.Firstname != null && b.ApplUser.Firstname.ToLower().Contains(lowerSearch)) ||
-            (b.PaymentStatus != null && b.PaymentStatus.ToLower().Contains(lowerSearch)));
-    }
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                string lowerSearch = searchString.ToLower();
+                bookingsQuery = bookingsQuery.Where(b =>
+                    (b.ApplUser.Firstname != null && b.ApplUser.Firstname.ToLower().Contains(lowerSearch)) ||
+                    (b.PaymentStatus != null && b.PaymentStatus.ToLower().Contains(lowerSearch)));
+            }
 
-    // Use the PaginatedList helper class to paginate results
-    var paginatedBookings = await PaginatedList<Bookings>.CreateAsync(bookingsQuery.AsNoTracking(), pageNumber ?? 1, pageSize);
+            var paginatedBookings = await PaginatedList<Bookings>.CreateAsync(bookingsQuery.AsNoTracking(), pageNumber ?? 1, pageSize);
 
-    // Pass the search string to the ViewData so the view can keep it in the search box
-    ViewData["CurrentFilter"] = searchString;
+            ViewData["CurrentFilter"] = searchString;
 
-    return View(paginatedBookings);
-}
-
+            return View(paginatedBookings);
+        }
 
         // GET: Bookings/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -63,7 +60,7 @@ namespace EpitomelHotel.Controllers
 
             var bookings = await _context.Bookings
                 .Include(b => b.ApplUser)
-                .Include(b => b.Room) // Include Room here for consistency and completeness
+                .Include(b => b.Room)
                 .FirstOrDefaultAsync(m => m.BookingID == id);
 
             if (bookings == null)
@@ -76,35 +73,70 @@ namespace EpitomelHotel.Controllers
 
         [Authorize]
         // GET: Bookings/Create
-        public IActionResult Create()
+        public IActionResult Create(DateTime? checkIn, DateTime? checkOut, int? roomId)
         {
-
             ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType");
             ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Firstname");
-            return View();
+
+            var model = new Bookings();
+
+            if (checkIn.HasValue)
+                model.CheckIn = checkIn.Value;
+            if (checkOut.HasValue)
+                model.CheckOut = checkOut.Value;
+            if (roomId.HasValue)
+                model.RoomID = roomId.Value;
+
+            if (model.CheckIn != default && model.CheckOut != default && model.RoomID != 0)
+            {
+                int duration = (model.CheckOut - model.CheckIn).Days;
+                if (duration > 0)
+                {
+                    const decimal dailyRate = 75m;
+                    model.TotalAmount = dailyRate * duration;
+                }
+            }
+
+            return View(model);
         }
 
-        // POST: Bookings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BookingID,CheckIn,CheckOut,TotalAmount,PaymentStatus,RoomID")] Bookings bookings)
-
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            bookings.ApplUserID = userId; // Assign current user ID
+            bookings.ApplUserID = userId; // assign current user id
+
+            int duration = (bookings.CheckOut - bookings.CheckIn).Days;
+            if (duration <= 0)
+            {
+                ModelState.AddModelError("CheckOut", "Check-out must be after check-in.");
+            }
+            else
+            {
+                const decimal dailyRate = 75m;
+                bookings.TotalAmount = dailyRate * duration;
+            }
+
+            // Assign default PaymentStatus until user has paid
+            if (string.IsNullOrEmpty(bookings.PaymentStatus))
+            {
+                bookings.PaymentStatus = "Pending"; 
+            }
 
             if (!ModelState.IsValid)
             {
                 _context.Add(bookings);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Confirmation), new { id = bookings.BookingID });
-
             }
 
-            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType");
-            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Firstname");
-            return View();
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookings.RoomID);
+            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Firstname", bookings.ApplUserID);
+
+            return View(bookings);
         }
+
 
         [Authorize]
         public async Task<IActionResult> RedirectToMyBookings()
@@ -126,7 +158,6 @@ namespace EpitomelHotel.Controllers
             }
         }
 
-
         // GET: Bookings/Confirmation/5
         public async Task<IActionResult> Confirmation(int? id)
         {
@@ -143,7 +174,6 @@ namespace EpitomelHotel.Controllers
 
             return View(booking);
         }
-    
 
         // GET: Bookings/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -206,7 +236,7 @@ namespace EpitomelHotel.Controllers
 
             var bookings = await _context.Bookings
                 .Include(b => b.ApplUser)
-                .Include(b => b.Room) // Include Room on delete details view as well
+                .Include(b => b.Room)
                 .FirstOrDefaultAsync(m => m.BookingID == id);
             if (bookings == null)
             {

@@ -5,7 +5,7 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Rooms</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -21,50 +21,41 @@
     </div>
 </form>
 
-<table class="table table-bordered" style="color: white">
-    <thead>
-        <tr>
-            <th>
-                Room Type
-            </th>
-            <th>
-                Price
-            </th>
-            <th>
-                Capacity
-            </th>
-            <th>
-                Status
-            </th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.RoomType)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Capacity)
-            </td>
-            @if (User.Identity.IsAuthenticated)
-                <td>
-                    @item.Status?.StatusName
-                </td>
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3">
+    @foreach (var item in Model)
+    {
+        <div class="col">
+            <div class="card h-100 text-white bg-dark border-light">
+                <img src="~/Images/bar.jpg" class="card-img-top" alt="@item.RoomType" style="height: 150px; object-fit: cover;">
+                <div class="card-body p-2">
+                    <h6 class="card-title mb-1">@item.RoomType</h6>
+                    <p class="card-text small mb-0">
+                        <strong>Price:</strong> @item.Price <br />
+                        <strong>Capacity:</strong> @item.Capacity <br />
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <strong>Status:</strong> @item.Status?.StatusName
+                        }
+                    </p>
+                </div>
+                <div class="card-footer p-1">
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a class="btn btn-warning btn-sm me-1" asp-action="Edit" asp-route-id="@item.RoomID">Edit</a>
+                        <a class="btn btn-info btn-sm me-1" asp-action="Details" asp-route-id="@item.RoomID">Details</a>
+                        <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@item.RoomID">Delete</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-info btn-sm" asp-action="Details" asp-route-id="@item.RoomID">Details</a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
 
-            <td>
-                    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.RoomID">Edit</a> |
-                    <a class="btn btn-info" asp-action="Details" asp-route-id="@item.RoomID">Details</a> |
-                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.RoomID">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+
 
 @{
     var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";

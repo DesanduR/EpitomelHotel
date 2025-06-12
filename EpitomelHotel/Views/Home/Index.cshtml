@@ -27,20 +27,53 @@
 
     <h1 class="p1">Welcome to EpitomelHotel</h1>
     <div id="HotelImages" class="carousel slide carousel-fade" data-bs-ride="carousel">
+        <style>
+            #HotelImages {
+                max-width: 1000px;
+                margin: auto;
+            }
+
+            .carousel-item img {
+                width: 100%;
+                height: auto;
+                object-fit: cover;
+                border-radius: 15px;
+            }
+
+            .carousel-control-prev,
+            .carousel-control-next {
+                width: 8%; 
+            }
+
+            .carousel-control-prev-icon,
+            .carousel-control-next-icon {
+                background-size: 100% 100%; /* Make icon scale to the new button size */
+                width: 3rem;
+                height: 3rem;
+            }
+
+            .carousel-control-prev:hover,
+            .carousel-control-next:hover {
+                background-color: rgba(0, 0, 0, 0.2); /* overlay on hover */
+            }
+
+
+        </style>
         <div class="carousel-indicators">
             <button type="button" data-bs-target="#HotelImages" data-bs-slide-to="0" class="active"></button>
             <button type="button" data-bs-target="#HotelImages" data-bs-slide-to="1"></button>
             <button type="button" data-bs-target="#HotelImages" data-bs-slide-to="2"></button>
         </div>
+        
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <img src="/Images/pol.jpeg" class="d-block mx-auto w-50" alt="Pool">
+                <img src="/Images/pol.jpeg" class="d-block mx-auto w-100" alt="Pool">
             </div>
             <div class="carousel-item">
-                <img src="/Images/garden.jpg" class="d-block mx-auto w-50" alt="Garden">
+                <img src="/Images/garden.jpg" class="d-block mx-auto w-100" alt="Garden">
             </div>
             <div class="carousel-item">
-                <img src="/Images/lounge.jpeg" class="d-block mx-auto w-50" alt="Lounge">
+                <img src="/Images/lounge.jpeg" class="d-block mx-auto w-100" alt="Lounge">
             </div>
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#HotelImages" data-bs-slide="prev">
@@ -52,6 +85,37 @@
             <span class="visually-hidden">Next</span>
         </button>
     </div>
+    <!-- Check-in / Check-out Booking Form -->
+    <div class="container my-5">
+        <form asp-controller="Bookings" asp-action="Create" method="get" class="row justify-content-center">
+            <div class="col-md-3">
+                <label for="checkIn" class="form-label">Check-in Date</label>
+                <input type="date" id="checkIn" name="checkIn" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+            </div>
+            <div class="col-md-3">
+                <label for="checkOut" class="form-label">Check-out Date</label>
+                <input type="date" id="checkOut" name="checkOut" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                <span id="checkout-error" class="text-danger"></span>
+            </div>
+            <div class="col-md-3">
+                <label for="roomId" class="form-label">Room</label>
+                <select id="roomId" name="roomId" class="form-control">
+                   
+                    <option value="">Select Room</option>
+                    <option value="1">Single</option>
+                    <option value="2">Double</option>
+                    <option value="3">Deluxe</option>
+                    <option value="4">Suite</option>
+                    <option value="5">Family</option>
+                    <option value="6">Penthouse</option>
+                </select>
+            </div>
+            <div class="col-md-2 align-self-end">
+                <button type="submit" class="btn btn-primary w-100">Book Now</button>
+            </div>
+        </form>
+    </div>
+
 
     <div class="container">
         <div class="row justify-content-center" style="margin-top: 150px;">
@@ -77,3 +141,42 @@
         </div>
     </div>
 </div>
+
+
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+        const checkInInput = document.getElementById("checkIn");
+        const checkOutInput = document.getElementById("checkOut");
+        const checkOutError = document.getElementById("checkout-error");
+
+        function validateDates() {
+            const checkIn = new Date(checkInInput.value);
+            const checkOut = new Date(checkOutInput.value);
+
+            if (checkInInput.value && checkOutInput.value) {
+                if (checkOut <= checkIn) {
+                    checkOutInput.setCustomValidity("Check-out must be after check-in.");
+                    checkOutError.innerText = "Check-out must be after check-in.";
+                } else {
+                    checkOutInput.setCustomValidity("");
+                    checkOutError.innerText = "";
+                }
+            } else {
+                checkOutInput.setCustomValidity("");
+                checkOutError.innerText = "";
+            }
+        }
+
+        checkInInput.addEventListener("change", function () {
+            if (checkInInput.value) {
+                const minDate = new Date(checkInInput.value);
+                minDate.setDate(minDate.getDate() + 1);
+                checkOutInput.min = minDate.toISOString().split("T")[0];
+            }
+            validateDates();
+        });
+
+        checkOutInput.addEventListener("change", validateDates);
+    });
+
+</script>

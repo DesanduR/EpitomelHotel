@@ -20,6 +20,7 @@ namespace EpitomelHotel.Controllers
         {
             _context = context;
         }
+        [Authorize]
 
         // GET: Bookings
         public async Task<IActionResult> Index(string searchString, int? pageNumber, int pageSize = 5)
@@ -71,7 +72,7 @@ namespace EpitomelHotel.Controllers
             return View(bookings);
         }
 
-        [Authorize]
+        
         // GET: Bookings/Create
         public IActionResult Create(DateTime? checkIn, DateTime? checkOut, int? roomId)
         {

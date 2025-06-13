@@ -104,7 +104,21 @@ namespace EpitomelHotel.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BookingID,CheckIn,CheckOut,TotalAmount,PaymentStatus,RoomID")] Bookings bookings)
+
         {
+            bool isRoomAvailable = !_context.Bookings.Any(b =>
+    b.RoomID == bookings.RoomID &&
+    ((bookings.CheckIn >= b.CheckIn && bookings.CheckIn < b.CheckOut) ||
+     (bookings.CheckOut > b.CheckIn && bookings.CheckOut <= b.CheckOut) ||
+     (bookings.CheckIn <= b.CheckIn && bookings.CheckOut >= b.CheckOut))
+);
+
+            if (!isRoomAvailable)
+            {
+                ModelState.AddModelError("", "Room is already booked for the selected dates.");
+            }
+
+            
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             bookings.ApplUserID = userId; // assign current user id
 
@@ -175,6 +189,79 @@ namespace EpitomelHotel.Controllers
 
             return View(booking);
         }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public IActionResult StartCreate(DateTime checkIn, DateTime checkOut, int roomId)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction(nameof(Create), new { checkIn, checkOut, roomId });
+            }
+
+            // Store the values for use after login
+            TempData["CheckIn"] = checkIn.ToString("o");
+            TempData["CheckOut"] = checkOut.ToString("o");
+            TempData["RoomID"] = roomId.ToString();
+
+            // Redirect to login with return URL to ResumeCreate
+            var returnUrl = Url.Action("ResumeCreate", "Bookings");
+            return RedirectToPage("/Account/Login", new { area = "Identity", returnUrl });
+        }
+
+        [Authorize]
+        public async Task<IActionResult> ResumeCreate()
+        {
+            if (TempData["CheckIn"] == null || TempData["CheckOut"] == null || TempData["RoomID"] == null)
+                return RedirectToAction("Index", "Home");
+
+            DateTime checkIn = DateTime.Parse(TempData["CheckIn"].ToString());
+            DateTime checkOut = DateTime.Parse(TempData["CheckOut"].ToString());
+            int roomId = int.Parse(TempData["RoomID"].ToString());
+
+            // Auto-submit booking
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var booking = new Bookings
+            {
+                CheckIn = checkIn,
+                CheckOut = checkOut,
+                RoomID = roomId,
+                ApplUserID = userId,
+                PaymentStatus = "Pending"
+            };
+
+            int duration = (checkOut - checkIn).Days;
+            if (duration > 0)
+            {
+                const decimal dailyRate = 75m;
+                booking.TotalAmount = dailyRate * duration;
+            }
+            else
+            {
+                TempData["Error"] = "Invalid booking dates.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            bool isRoomAvailable = !_context.Bookings.Any(b =>
+                b.RoomID == roomId &&
+                ((checkIn >= b.CheckIn && checkIn < b.CheckOut) ||
+                 (checkOut > b.CheckIn && checkOut <= b.CheckOut) ||
+                 (checkIn <= b.CheckIn && checkOut >= b.CheckOut))
+            );
+
+            if (!isRoomAvailable)
+            {
+                TempData["Error"] = "Room is already booked for the selected dates.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            _context.Bookings.Add(booking);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Confirmation), new { id = booking.BookingID });
+        }
+
 
         // GET: Bookings/Edit/5
         public async Task<IActionResult> Edit(int? id)

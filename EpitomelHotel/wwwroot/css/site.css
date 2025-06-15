@@ -72,4 +72,12 @@ body {
         color: #212529;
     }
 
+.hotel-link:hover {
+    color: #f39c12 !important;
+    text-decoration: underline;
+    background-color: transparent;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+
 

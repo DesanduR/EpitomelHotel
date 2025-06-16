@@ -22,7 +22,7 @@ namespace EpitomelHotel.Controllers
         // GET: BookingServices
         public async Task<IActionResult> Index()
         {
-            var epitomelHotelDbContext = _context.BookingService.Include(b => b.Room);
+            var epitomelHotelDbContext = _context.BookingService.Include(b => b.Room).Include(b => b.Service);
             return View(await epitomelHotelDbContext.ToListAsync());
         }
 
@@ -36,6 +36,7 @@ namespace EpitomelHotel.Controllers
 
             var bookingService = await _context.BookingService
                 .Include(b => b.Room)
+                .Include(b => b.Service)
                 .FirstOrDefaultAsync(m => m.BookingServiceID == id);
             if (bookingService == null)
             {
@@ -49,6 +50,7 @@ namespace EpitomelHotel.Controllers
         public IActionResult Create()
         {
             ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType");
+            ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName");
             return View();
         }
 
@@ -57,7 +59,7 @@ namespace EpitomelHotel.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BookingServiceID,ServiceCost,RoomID")] BookingService bookingService)
+        public async Task<IActionResult> Create([Bind("BookingServiceID,ServiceCost,RoomID,ServiceID")] BookingService bookingService)
         {
             if (ModelState.IsValid)
             {
@@ -66,6 +68,7 @@ namespace EpitomelHotel.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookingService.RoomID);
+            ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName", bookingService.ServiceID);
             return View(bookingService);
         }
 
@@ -83,6 +86,7 @@ namespace EpitomelHotel.Controllers
                 return NotFound();
             }
             ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookingService.RoomID);
+            ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName", bookingService.ServiceID);
             return View(bookingService);
         }
 
@@ -91,7 +95,7 @@ namespace EpitomelHotel.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("BookingServiceID,ServiceCost,RoomID")] BookingService bookingService)
+        public async Task<IActionResult> Edit(int id, [Bind("BookingServiceID,ServiceCost,RoomID,ServiceID")] BookingService bookingService)
         {
             if (id != bookingService.BookingServiceID)
             {
@@ -119,6 +123,7 @@ namespace EpitomelHotel.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookingService.RoomID);
+            ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName", bookingService.ServiceID);
             return View(bookingService);
         }
 
@@ -132,6 +137,7 @@ namespace EpitomelHotel.Controllers
 
             var bookingService = await _context.BookingService
                 .Include(b => b.Room)
+                .Include(b => b.Service)
                 .FirstOrDefaultAsync(m => m.BookingServiceID == id);
             if (bookingService == null)
             {

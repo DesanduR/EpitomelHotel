@@ -20,7 +20,13 @@ namespace EpitomelHotel.Models
         [Display(Name = "Room Number")]
         public virtual Rooms Room { get; set; }
 
-        
-        public virtual ICollection<Services> Services { get; set; }
+
+        [ForeignKey("ServiceID"), Required]
+        public int ServiceID { get; set; }
+
+        [Display(Name = "Service")]
+
+        public Services Service { get; set; }
+
     }
 }

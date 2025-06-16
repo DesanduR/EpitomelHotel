@@ -9,18 +9,15 @@ namespace EpitomelHotel.Models
         [Key]
         public int ServiceID { get; set; }
 
-        
+        public virtual ICollection<BookingService> BookingServices { get; set; }
 
         [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[a-zA-Z0-9 ]+$", ErrorMessage = "ServiceName required.")]
         public string ServiceName { get; set; }
 
-        [ForeignKey("BookingServiceID"), Required]
-        public int BookingServiceID { get; set; }
 
-        [Display(Name = "Booking Service")]
+       
 
-        public BookingService BookingService { get; set; }
-
+        
 
 
 

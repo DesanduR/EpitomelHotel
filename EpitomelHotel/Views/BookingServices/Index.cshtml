@@ -9,7 +9,7 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table table-bordered" style="color: white">
+<table class="table">
     <thead>
         <tr>
             <th>
@@ -17,6 +17,9 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Room)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Service)
             </th>
             <th></th>
         </tr>
@@ -31,9 +34,12 @@
                 @Html.DisplayFor(modelItem => item.Room.RoomType)
             </td>
             <td>
-                    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.BookingServiceID">Edit</a> |
-                    <a class="btn btn-info" asp-action="Details" asp-route-id="@item.BookingServiceID">Details</a> |
-                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.BookingServiceID">Delete</a>
+                @Html.DisplayFor(modelItem => item.Service.ServiceName)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.BookingServiceID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.BookingServiceID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.BookingServiceID">Delete</a>
             </td>
         </tr>
 }

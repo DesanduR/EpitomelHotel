@@ -6,29 +6,42 @@
 
 <h1>Index</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
+@if (User.Identity.IsAuthenticated)
+{
+    <p>
+        <a class="btn btn-primary" asp-controller="BookingServices" asp-action="Create">Create New</a>
+    </p>
+}
+<table class="table table-bordered" style="color: white">
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.ServiceName)
             </th>
-            <th></th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ServiceName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ServiceID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ServiceID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ServiceID">Delete</a>
-            </td>
+        @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ServiceName)
+                </td>
+
+                <td>
+                    @if (User.IsInRole("Admin"))
+                    {
+
+                        <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.ServiceID">Edit</a>
+                        <a class="btn btn-info" asp-action="Details" asp-route-id="@item.ServiceID">Details</a>
+                        <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.ServiceID">Delete</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-info" asp-action="Details" asp-route-id="@item.ServiceID">Details</a>
+                    }
+                </td>
+
         </tr>
 }
     </tbody>

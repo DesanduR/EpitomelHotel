@@ -49,14 +49,14 @@ namespace EpitomelHotel.Controllers
         // GET: BookingServices/Create
         public IActionResult Create()
         {
-            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType");
+            // Populate dropdowns for Services and Rooms
             ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName");
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomName");  // <-- Added this line
+
             return View();
         }
 
         // POST: BookingServices/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BookingServiceID,ServiceCost,RoomID,ServiceID")] BookingService bookingService)
@@ -67,8 +67,11 @@ namespace EpitomelHotel.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookingService.RoomID);
+
+            // If invalid, reload dropdowns with selected values
             ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName", bookingService.ServiceID);
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomName", bookingService.RoomID);  // <-- Added this line
+
             return View(bookingService);
         }
 
@@ -85,14 +88,15 @@ namespace EpitomelHotel.Controllers
             {
                 return NotFound();
             }
-            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookingService.RoomID);
+
+            // Populate dropdowns with current selected values
             ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName", bookingService.ServiceID);
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomName", bookingService.RoomID);  // <-- Added this line
+
             return View(bookingService);
         }
 
         // POST: BookingServices/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("BookingServiceID,ServiceCost,RoomID,ServiceID")] BookingService bookingService)
@@ -122,8 +126,11 @@ namespace EpitomelHotel.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookingService.RoomID);
+
+            // If invalid, reload dropdowns with selected values
             ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName", bookingService.ServiceID);
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomName", bookingService.RoomID);  // <-- Added this line
+
             return View(bookingService);
         }
 

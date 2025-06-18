@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -22,26 +20,23 @@ namespace EpitomelHotel.Controllers
         // GET: BookingServices
         public async Task<IActionResult> Index()
         {
-            var epitomelHotelDbContext = _context.BookingService.Include(b => b.Room).Include(b => b.Service);
-            return View(await epitomelHotelDbContext.ToListAsync());
+            var bookingServices = _context.BookingService
+                .Include(b => b.Room)
+                .Include(b => b.Service);
+            return View(await bookingServices.ToListAsync());
         }
 
         // GET: BookingServices/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var bookingService = await _context.BookingService
                 .Include(b => b.Room)
                 .Include(b => b.Service)
                 .FirstOrDefaultAsync(m => m.BookingServiceID == id);
-            if (bookingService == null)
-            {
-                return NotFound();
-            }
+
+            if (bookingService == null) return NotFound();
 
             return View(bookingService);
         }
@@ -49,9 +44,8 @@ namespace EpitomelHotel.Controllers
         // GET: BookingServices/Create
         public IActionResult Create()
         {
-            // Populate dropdowns for Services and Rooms
             ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName");
-            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomName");  // <-- Added this line
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType");
 
             return View();
         }
@@ -61,16 +55,15 @@ namespace EpitomelHotel.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BookingServiceID,ServiceCost,RoomID,ServiceID")] BookingService bookingService)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 _context.Add(bookingService);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            // If invalid, reload dropdowns with selected values
             ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName", bookingService.ServiceID);
-            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomName", bookingService.RoomID);  // <-- Added this line
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookingService.RoomID);
 
             return View(bookingService);
         }
@@ -78,20 +71,13 @@ namespace EpitomelHotel.Controllers
         // GET: BookingServices/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var bookingService = await _context.BookingService.FindAsync(id);
-            if (bookingService == null)
-            {
-                return NotFound();
-            }
+            if (bookingService == null) return NotFound();
 
-            // Populate dropdowns with current selected values
             ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName", bookingService.ServiceID);
-            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomName", bookingService.RoomID);  // <-- Added this line
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookingService.RoomID);
 
             return View(bookingService);
         }
@@ -101,12 +87,9 @@ namespace EpitomelHotel.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("BookingServiceID,ServiceCost,RoomID,ServiceID")] BookingService bookingService)
         {
-            if (id != bookingService.BookingServiceID)
-            {
-                return NotFound();
-            }
+            if (id != bookingService.BookingServiceID) return NotFound();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 try
                 {
@@ -116,20 +99,15 @@ namespace EpitomelHotel.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!BookingServiceExists(bookingService.BookingServiceID))
-                    {
                         return NotFound();
-                    }
                     else
-                    {
                         throw;
-                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
 
-            // If invalid, reload dropdowns with selected values
             ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName", bookingService.ServiceID);
-            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomName", bookingService.RoomID);  // <-- Added this line
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookingService.RoomID);
 
             return View(bookingService);
         }
@@ -137,19 +115,14 @@ namespace EpitomelHotel.Controllers
         // GET: BookingServices/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var bookingService = await _context.BookingService
                 .Include(b => b.Room)
                 .Include(b => b.Service)
                 .FirstOrDefaultAsync(m => m.BookingServiceID == id);
-            if (bookingService == null)
-            {
-                return NotFound();
-            }
+
+            if (bookingService == null) return NotFound();
 
             return View(bookingService);
         }
@@ -163,9 +136,9 @@ namespace EpitomelHotel.Controllers
             if (bookingService != null)
             {
                 _context.BookingService.Remove(bookingService);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

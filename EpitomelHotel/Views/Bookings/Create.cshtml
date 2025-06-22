@@ -27,11 +27,8 @@
                 <span asp-validation-for="CheckOut" class="text-danger" id="checkout-error"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="TotalAmount" class="control-label"></label>
-                <input asp-for="TotalAmount" class="form-control" id="total-amount" readonly />
-                <span asp-validation-for="TotalAmount" class="text-danger"></span>
-            </div>
+            <input asp-for="TotalAmount" type="hidden" />
+
 
             @if (User.IsInRole("Admin"))
             {

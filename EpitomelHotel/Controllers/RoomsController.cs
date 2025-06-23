@@ -20,9 +20,17 @@ namespace EpitomelHotel.Controllers
         }
 
         // GET: Rooms
-        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
+        public async Task<IActionResult> Index(
+     string sortOrder,
+     string currentFilter,
+     string searchString,
+     string roomType,       // new filter param
+     string priceRange,     // new filter param
+     int? pageNumber)
         {
             ViewData["CurrentSort"] = sortOrder;
+            ViewData["SelectedRoomType"] = roomType;       // pass filter to view
+            ViewData["SelectedPriceRange"] = priceRange;
 
             if (searchString != null)
             {
@@ -32,12 +40,41 @@ namespace EpitomelHotel.Controllers
             {
                 searchString = currentFilter;
             }
+
             var rooms = _context.Rooms.Include(r => r.Status).AsQueryable();
 
-            if (!String.IsNullOrEmpty(searchString))
+            // Search by RoomType name
+            if (!string.IsNullOrEmpty(searchString))
             {
-                rooms = rooms.Where(s => s.RoomType.Contains(searchString));
+                rooms = rooms.Where(r => r.RoomType.Contains(searchString));
             }
+
+            // Filter by roomType
+            if (!string.IsNullOrEmpty(roomType))
+            {
+                rooms = rooms.Where(r => r.RoomType == roomType);
+            }
+
+            // Filter by priceRange
+            if (!string.IsNullOrEmpty(priceRange))
+            {
+                switch (priceRange)
+                {
+                    case "Under 100":
+                        rooms = rooms.Where(r => r.Price < 100);
+                        break;
+                    case "100-200":
+                        rooms = rooms.Where(r => r.Price >= 100 && r.Price <= 200);
+                        break;
+                    case "200-300":
+                        rooms = rooms.Where(r => r.Price > 200 && r.Price <= 300);
+                        break;
+                    case "300+":
+                        rooms = rooms.Where(r => r.Price > 300);
+                        break;
+                }
+            }
+
             int pageSize = 5;
             return View(await PaginatedList<Rooms>.CreateAsync(rooms.AsNoTracking(), pageNumber ?? 1, pageSize));
         }

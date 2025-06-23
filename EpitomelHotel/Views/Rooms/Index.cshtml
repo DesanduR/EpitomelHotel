@@ -1,83 +1,137 @@
-﻿@using EpitomelHotel.Models;
+﻿@using EpitomelHotel.Models
 @model PaginatedList<EpitomelHotel.Models.Rooms>
 
 @{
     ViewData["Title"] = "Index";
+
+    // Example room types and price ranges - replace with your dynamic data if available
+    var roomTypes = new List<string> { "Single", "Double", "Suite", "Deluxe" };
+    var priceRanges = new List<string> { "Under 100", "100-200", "200-300", "300+" };
+
+    // Get current filters from query string or ViewData (you might have these in your controller)
+    string selectedRoomType = ViewData["SelectedRoomType"] as string ?? "";
+    string selectedPriceRange = ViewData["SelectedPriceRange"] as string ?? "";
 }
 
 <h1>Rooms</h1>
 
-<p>
-    <a class="btn btn-primary" asp-action="Create">Create New</a>
-</p>
+<div class="row">
+    <!-- Sidebar filters -->
+    <div class="col-12 col-md-3 mb-4">
+        <div class="card bg-dark text-light p-3 sticky-top" style="top: 1rem;">
+            <h5>Filter by Room Type</h5>
+            <div class="d-grid gap-2 mb-4">
+                <a asp-action="Index"
+                   asp-route-roomType=""
+                   asp-route-priceRange="@selectedPriceRange"
+                   class="btn btn-outline-light @(string.IsNullOrEmpty(selectedRoomType) ? "active" : "")">
+                    All Types
+                </a>
+                @foreach (var type in roomTypes)
+                {
+                    <a asp-action="Index"
+                       asp-route-roomType="@type"
+                       asp-route-priceRange="@selectedPriceRange"
+                       class="btn btn-outline-light @(selectedRoomType == type ? "active" : "")">
+                        @type
+                    </a>
+                }
+            </div>
 
-<form asp-action="Index" method="get">
-    <div class="form-actions no-color">
-        <p>
-            <label>Find by name: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" /></label>
-            <input type="submit" value="Search" class="btn btn-outline-dark" style="color: white" | />
-            <a class="btn btn-primary" asp-action="Index">Back to Full List</a>
-        </p>
-    </div>
-</form>
-
-<div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3">
-    @foreach (var item in Model)
-    {
-        <div class="col">
-            <div class="card h-100 text-white bg-dark border-light">
-                <img src="~/Images/bar.jpg" class="card-img-top" alt="@item.RoomType" style="height: 150px; object-fit: cover;">
-                <div class="card-body p-2">
-                    <h6 class="card-title mb-1">@item.RoomType</h6>
-                    <p class="card-text small mb-0">
-                        <strong>Price:</strong> @item.Price <br />
-                        <strong>Capacity:</strong> @item.Capacity <br />
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <strong>Status:</strong> @item.Status?.StatusName
-                        }
-                    </p>
-                </div>
-                <div class="card-footer p-1">
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <a class="btn btn-warning btn-sm me-1" asp-action="Edit" asp-route-id="@item.RoomID">Edit</a>
-                        <a class="btn btn-info btn-sm me-1" asp-action="Details" asp-route-id="@item.RoomID">Details</a>
-                        <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@item.RoomID">Delete</a>
-                    }
-                    else
-                    {
-                        <a class="btn btn-info btn-sm" asp-action="Details" asp-route-id="@item.RoomID">Details</a>
-                    }
-                </div>
+            <h5>Filter by Price</h5>
+            <div class="d-grid gap-2">
+                <a asp-action="Index"
+                   asp-route-roomType="@selectedRoomType"
+                   asp-route-priceRange=""
+                   class="btn btn-outline-light @(string.IsNullOrEmpty(selectedPriceRange) ? "active" : "")">
+                    All Prices
+                </a>
+                @foreach (var range in priceRanges)
+                {
+                    <a asp-action="Index"
+                       asp-route-roomType="@selectedRoomType"
+                       asp-route-priceRange="@range"
+                       class="btn btn-outline-light @(selectedPriceRange == range ? "active" : "")">
+                        @range
+                    </a>
+                }
             </div>
         </div>
-    }
-</div>
+    </div>
 
+    <!-- Rooms listing -->
+    <div class="col-12 col-md-9">
+        <!-- Search form -->
+        <form asp-action="Index" method="get" class="mb-3">
+            <div class="input-group">
+                <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Find by name..." />
+                <button type="submit" class="btn btn-outline-dark" style="color: white;">Search</button>
+                <a class="btn btn-secondary ms-2" asp-action="Index">Back to Full List</a>
+            </div>
+        </form>
 
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+            @foreach (var item in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 text-white bg-dark border-light">
+                        <img src="~/Images/bar.jpg" class="card-img-top" alt="@item.RoomType" style="height: 150px; object-fit: cover;" />
+                        <div class="card-body p-2">
+                            <h6 class="card-title mb-1">@item.RoomType</h6>
+                            <p class="card-text small mb-0">
+                                <strong>Price:</strong> @item.Price <br />
+                                <strong>Capacity:</strong> @item.Capacity <br />
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <strong>Status:</strong> 
+                                    @item.Status?.StatusName
+                                }
+                            </p>
+                        </div>
+                        <div class="card-footer p-1">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a class="btn btn-warning btn-sm me-1" asp-action="Edit" asp-route-id="@item.RoomID">Edit</a>
+                                <a class="btn btn-info btn-sm me-1" asp-action="Details" asp-route-id="@item.RoomID">Details</a>
+                                <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@item.RoomID">Delete</a>
+                            }
+                            else
+                            {
+                                <a class="btn btn-info btn-sm" asp-action="Details" asp-route-id="@item.RoomID">Details</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
 
-@{
-    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
-}
+        @{
+            var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+            var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+        }
 
-<div class="pagination-container mt-4 d-flex justify-content-center">
-    <a asp-action="Index"
-       asp-route-sortOrder="@ViewData["CurrentSort"]"
-       asp-route-pageNumber="@(Model.PageIndex - 1)"
-       asp-route-currentFilter="@ViewData["CurrentFilter"]"
-       class="btn btn-outline-light me-2 @prevDisabled">
-        <i class="bi bi-arrow-left-circle-fill"></i> Previous
-    </a>
+        <div class="pagination-container mt-4 d-flex justify-content-center">
+            <a asp-action="Index"
+               asp-route-sortOrder="@ViewData["CurrentSort"]"
+               asp-route-pageNumber="@(Model.PageIndex - 1)"
+               asp-route-currentFilter="@ViewData["CurrentFilter"]"
+               asp-route-roomType="@selectedRoomType"
+               asp-route-priceRange="@selectedPriceRange"
+               class="btn btn-outline-light me-2 @prevDisabled">
+                <i class="bi bi-arrow-left-circle-fill"></i> Previous
+            </a>
 
-    <span class="text-light align-self-center">Page @Model.PageIndex of @Model.TotalPages</span>
+            <span class="text-light align-self-center">Page @Model.PageIndex of @Model.TotalPages</span>
 
-    <a asp-action="Index"
-       asp-route-sortOrder="@ViewData["CurrentSort"]"
-       asp-route-pageNumber="@(Model.PageIndex + 1)"
-       asp-route-currentFilter="@ViewData["CurrentFilter"]"
-       class="btn btn-outline-light ms-2 @nextDisabled">
-        Next <i class="bi bi-arrow-right-circle-fill"></i>
-    </a>
+            <a asp-action="Index"
+               asp-route-sortOrder="@ViewData["CurrentSort"]"
+               asp-route-pageNumber="@(Model.PageIndex + 1)"
+               asp-route-currentFilter="@ViewData["CurrentFilter"]"
+               asp-route-roomType="@selectedRoomType"
+               asp-route-priceRange="@selectedPriceRange"
+               class="btn btn-outline-light ms-2 @nextDisabled">
+                Next <i class="bi bi-arrow-right-circle-fill"></i>
+            </a>
+        </div>
+    </div>
 </div>

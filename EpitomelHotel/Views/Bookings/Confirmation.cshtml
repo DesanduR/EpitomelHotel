@@ -2,12 +2,25 @@
 
 <h2>Booking Confirmation</h2>
 
-<p>Thank you, @Model.ApplUser?.Firstname, your booking has been confirmed.</p>
+<p>Thank you, @Model.ApplUser?.Firstname ?? "Guest", your booking has been confirmed.</p>
 
-<p>Your assigned room number is: <strong>@Model.Room?.RoomID</strong></p>
+<p>Your assigned room number is: <strong>@Model.Room?.RoomID ?? "N/A"</strong></p>
 
-<p>Check-in date: @Model.CheckIn.ToShortDateString()</p>
-<p>Check-out date: @Model.CheckOut.ToShortDateString()</p>
+<p>
+    Check-in date: @(
+    Model.CheckIn.HasValue
+    ? Model.CheckIn.Value.ToShortDateString()
+        : "Not specified"
+        )
+</p>
+<p>
+    Check-out date: @(
+        Model.CheckOut.HasValue
+        ? Model.CheckOut.Value.ToShortDateString()
+        : "Not specified"
+        )
+</p>
+
 <p>Total amount: @Model.TotalAmount.ToString("C")</p>
 
 <a href="@Url.Action("Index", "Bookings")">Back to bookings</a>

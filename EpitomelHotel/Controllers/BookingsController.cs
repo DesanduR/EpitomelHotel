@@ -72,7 +72,8 @@ namespace EpitomelHotel.Controllers
             return View(bookings);
         }
 
-        
+
+        // GET: Bookings/Create
         // GET: Bookings/Create
         public IActionResult Create(DateTime? checkIn, DateTime? checkOut, int? roomId)
         {
@@ -82,15 +83,17 @@ namespace EpitomelHotel.Controllers
             var model = new Bookings();
 
             if (checkIn.HasValue)
-                model.CheckIn = checkIn.Value;
+                model.CheckIn = checkIn;
+
             if (checkOut.HasValue)
-                model.CheckOut = checkOut.Value;
+                model.CheckOut = checkOut;
+
             if (roomId.HasValue)
                 model.RoomID = roomId.Value;
 
-            if (model.CheckIn != default && model.CheckOut != default && model.RoomID != 0)
+            if (model.CheckIn.HasValue && model.CheckOut.HasValue && model.RoomID != 0)
             {
-                int duration = (model.CheckOut - model.CheckIn).Days;
+                int duration = (model.CheckOut.Value - model.CheckIn.Value).Days;
                 if (duration > 0)
                 {
                     const decimal dailyRate = 75m;
@@ -104,53 +107,67 @@ namespace EpitomelHotel.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BookingID,CheckIn,CheckOut,TotalAmount,PaymentStatus,RoomID")] Bookings bookings)
-
         {
-            bool isRoomAvailable = !_context.Bookings.Any(b =>
-    b.RoomID == bookings.RoomID &&
-    ((bookings.CheckIn >= b.CheckIn && bookings.CheckIn < b.CheckOut) ||
-     (bookings.CheckOut > b.CheckIn && bookings.CheckOut <= b.CheckOut) ||
-     (bookings.CheckIn <= b.CheckIn && bookings.CheckOut >= b.CheckOut))
-);
+            // Check for null dates since they're now nullable
+            if (!bookings.CheckIn.HasValue)
+                ModelState.AddModelError("CheckIn", "Check-in date is required.");
 
-            if (!isRoomAvailable)
+            if (!bookings.CheckOut.HasValue)
+                ModelState.AddModelError("CheckOut", "Check-out date is required.");
+
+            if (bookings.CheckIn.HasValue && bookings.CheckOut.HasValue)
             {
-                ModelState.AddModelError("", "Room is already booked for the selected dates.");
+                if (bookings.CheckOut <= bookings.CheckIn)
+                    ModelState.AddModelError("CheckOut", "Check-out must be after check-in.");
             }
 
-            
+            bool isRoomAvailable = false;
+            if (bookings.CheckIn.HasValue && bookings.CheckOut.HasValue)
+            {
+                isRoomAvailable = !_context.Bookings.Any(b =>
+                    b.RoomID == bookings.RoomID &&
+                    ((bookings.CheckIn >= b.CheckIn && bookings.CheckIn < b.CheckOut) ||
+                     (bookings.CheckOut > b.CheckIn && bookings.CheckOut <= b.CheckOut) ||
+                     (bookings.CheckIn <= b.CheckIn && bookings.CheckOut >= b.CheckOut))
+                );
+
+                if (!isRoomAvailable)
+                {
+                    ModelState.AddModelError("", "Room is already booked for the selected dates.");
+                }
+            }
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             bookings.ApplUserID = userId; // assign current user id
 
-            int duration = (bookings.CheckOut - bookings.CheckIn).Days;
-            if (duration <= 0)
+            if (bookings.CheckIn.HasValue && bookings.CheckOut.HasValue)
             {
-                ModelState.AddModelError("CheckOut", "Check-out must be after check-in.");
-            }
-            else
-            {
-                const decimal dailyRate = 75m;
-                bookings.TotalAmount = dailyRate * duration;
+                int duration = (bookings.CheckOut.Value - bookings.CheckIn.Value).Days;
+                if (duration > 0)
+                {
+                    const decimal dailyRate = 75m;
+                    bookings.TotalAmount = dailyRate * duration;
+                }
             }
 
             // Assign default PaymentStatus until user has paid
             if (string.IsNullOrEmpty(bookings.PaymentStatus))
             {
-                bookings.PaymentStatus = "Pending"; 
+                bookings.PaymentStatus = "Pending";
             }
 
             if (!ModelState.IsValid)
             {
-                _context.Add(bookings);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Confirmation), new { id = bookings.BookingID });
+                ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookings.RoomID);
+                ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Firstname", bookings.ApplUserID);
+                return View(bookings);
             }
 
-            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookings.RoomID);
-            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Firstname", bookings.ApplUserID);
-
-            return View(bookings);
+            _context.Add(bookings);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Confirmation), new { id = bookings.BookingID });
         }
+
 
 
         [Authorize]

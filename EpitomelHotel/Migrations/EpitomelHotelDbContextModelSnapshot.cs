@@ -140,10 +140,12 @@ namespace EpitomelHotel.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("CheckIn")
+                    b.Property<DateTime?>("CheckIn")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("CheckOut")
+                    b.Property<DateTime?>("CheckOut")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentStatus")

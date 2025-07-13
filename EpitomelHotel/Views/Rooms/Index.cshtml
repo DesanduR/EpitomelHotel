@@ -4,11 +4,11 @@
 @{
     ViewData["Title"] = "Index";
 
-    // Example room types and price ranges - replace with your dynamic data if available
+    // Example room types and price ranges 
     var roomTypes = new List<string> { "Single", "Double", "Suite", "Deluxe" };
     var priceRanges = new List<string> { "Under 100", "100-200", "200-300", "300+" };
 
-    // Get current filters from query string or ViewData (you might have these in your controller)
+    // Get current filters from query string or ViewData 
     string selectedRoomType = ViewData["SelectedRoomType"] as string ?? "";
     string selectedPriceRange = ViewData["SelectedPriceRange"] as string ?? "";
 }
@@ -16,7 +16,7 @@
 <h1>Rooms</h1>
 
 <div class="row">
-    <!-- Sidebar filters -->
+    
     <div class="col-12 col-md-3 mb-4">
         <div class="card bg-dark text-light p-3 sticky-top" style="top: 1rem;">
             <h5>Filter by Room Type</h5>
@@ -59,9 +59,9 @@
         </div>
     </div>
 
-    <!-- Rooms listing -->
+   
     <div class="col-12 col-md-9">
-        <!-- Search form -->
+        
         <form asp-action="Index" method="get" class="mb-3">
             <div class="input-group">
                 <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Find by name..." />

@@ -236,7 +236,7 @@ namespace EpitomelHotel.Controllers
             DateTime checkOut = DateTime.Parse(TempData["CheckOut"].ToString());
             int roomId = int.Parse(TempData["RoomID"].ToString());
 
-            // Auto-submit booking
+            // Auto submit booking
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var booking = new Bookings

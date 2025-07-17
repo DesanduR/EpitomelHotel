@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Index";
 
-    // Example room types and price ranges 
+    
     var roomTypes = new List<string> { "Single", "Double", "Suite", "Deluxe" };
     var priceRanges = new List<string> { "Under 100", "100-200", "200-300", "300+" };
 
@@ -110,7 +110,9 @@
             var nextDisabled = !Model.HasNextPage ? "disabled" : "";
         }
 
-        <div class="pagination-container mt-4 d-flex justify-content-center">
+        <div class="pagination-container mt-4 d-flex justify-content-center" style="position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); z-index: 1050;">
+       
+
             <a asp-action="Index"
                asp-route-sortOrder="@ViewData["CurrentSort"]"
                asp-route-pageNumber="@(Model.PageIndex - 1)"

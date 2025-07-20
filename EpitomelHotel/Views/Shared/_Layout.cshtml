@@ -63,11 +63,58 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="border-top bg-dark text-light py-4 mt-auto">
         <div class="container">
-            &copy; 2025 - EpitomelHotel - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row">
+                <!-- About -->
+                <div class="col-md-4 mb-3">
+                    <h5>Epitomel Hotel</h5>
+                    <p class="small">Experience luxury and comfort in the heart of the city. Your perfect stay awaits.</p>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="col-md-4 mb-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a asp-area="" asp-controller="Home" asp-action="Index" class="text-light text-decoration-none">Home</a></li>
+                        <li><a asp-area="" asp-controller="Rooms" asp-action="Index" class="text-light text-decoration-none">Rooms</a></li>
+                        <li><a asp-area="" asp-controller="Services" asp-action="Index" class="text-light text-decoration-none">Services</a></li>
+                        <li><a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-light text-decoration-none">Privacy Policy</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="col-md-4 mb-3">
+                    <h5>Contact Us</h5>
+                    <address class="small">
+                        123 Luxury St.<br>
+                        Cityville, CV 45678<br>
+                        Phone: (123) 456-7890<br>
+                        Email: <a href="mailto:info@epitomelhotel.com" class="text-light text-decoration-none">info@epitomelhotel.com</a>
+                    </address>
+                    <div>
+                        <a href="https://www.facebook.com/login.php" target="_blank" rel="noopener" class="text-light me-3">
+                            <i class="bi bi-facebook"></i> Facebook
+                        </a>
+                        <a href="https://twitter.com/login" target="_blank" rel="noopener" class="text-light me-3">
+                            <i class="bi bi-twitter"></i> Twitter
+                        </a>
+                        <a href="https://www.instagram.com/accounts/login/" target="_blank" rel="noopener" class="text-light">
+                            <i class="bi bi-instagram"></i> Instagram
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="bg-secondary" />
+
+            <div class="text-center small">
+                &copy; 2025 EpitomelHotel. All rights reserved.
+            </div>
         </div>
     </footer>
+
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

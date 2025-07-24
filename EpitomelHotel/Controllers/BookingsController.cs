@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -20,80 +19,49 @@ namespace EpitomelHotel.Controllers
         {
             _context = context;
         }
-        [Authorize]
 
-        // GET: Bookings
+        [Authorize]
         public async Task<IActionResult> Index(string searchString, int? pageNumber, int pageSize = 5)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            IQueryable<Bookings> bookingsQuery = _context.Bookings
-                .Include(b => b.ApplUser)
-                .Include(b => b.Room);
-
-            if (!User.IsInRole("Admin"))
-            {
-                bookingsQuery = bookingsQuery.Where(b => b.ApplUserID == userId);
-            }
-
-            if (!string.IsNullOrWhiteSpace(searchString))
-            {
-                string lowerSearch = searchString.ToLower();
-                bookingsQuery = bookingsQuery.Where(b =>
-                    (b.ApplUser.Firstname != null && b.ApplUser.Firstname.ToLower().Contains(lowerSearch)) ||
-                    (b.PaymentStatus != null && b.PaymentStatus.ToLower().Contains(lowerSearch)));
-            }
-
-            var paginatedBookings = await PaginatedList<Bookings>.CreateAsync(bookingsQuery.AsNoTracking(), pageNumber ?? 1, pageSize);
-
-            ViewData["CurrentFilter"] = searchString;
-
-            return View(paginatedBookings);
-        }
-
-        // GET: Bookings/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var bookings = await _context.Bookings
+            var bookings = _context.Bookings
                 .Include(b => b.ApplUser)
                 .Include(b => b.Room)
-                .FirstOrDefaultAsync(m => m.BookingID == id);
+                .AsQueryable();
 
-            if (bookings == null)
+            if (!string.IsNullOrEmpty(searchString))
             {
-                return NotFound();
+                bookings = bookings.Where(b => b.ApplUser.Firstname.Contains(searchString));
             }
 
-            return View(bookings);
+            return View(await bookings.ToListAsync());
         }
-
-
-        // GET: Bookings/Create
-        // GET: Bookings/Create
+        [Authorize]
         public IActionResult Create(DateTime? checkIn, DateTime? checkOut, int? roomId)
         {
             ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType");
-            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Firstname");
+
+            if (User.IsInRole("Admin"))
+            {
+                ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Firstname");
+            }
 
             var model = new Bookings();
 
             if (checkIn.HasValue)
-                model.CheckIn = checkIn;
+                model.CheckIn = checkIn.Value;
 
             if (checkOut.HasValue)
-                model.CheckOut = checkOut;
+                model.CheckOut = checkOut.Value;
 
             if (roomId.HasValue)
                 model.RoomID = roomId.Value;
 
-            if (model.CheckIn.HasValue && model.CheckOut.HasValue && model.RoomID != 0)
+            // Safely calculate duration only if both dates are provided
+            if (checkIn.HasValue && checkOut.HasValue && roomId.HasValue)
             {
-                int duration = (model.CheckOut.Value - model.CheckIn.Value).Days;
+                TimeSpan span = checkOut.Value - checkIn.Value;
+                int duration = span.Days;
+
                 if (duration > 0)
                 {
                     const decimal dailyRate = 75m;
@@ -104,53 +72,48 @@ namespace EpitomelHotel.Controllers
             return View(model);
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BookingID,CheckIn,CheckOut,TotalAmount,PaymentStatus,RoomID")] Bookings bookings)
         {
-            // Check for null dates since they're now nullable
-            if (!bookings.CheckIn.HasValue)
-                ModelState.AddModelError("CheckIn", "Check-in date is required.");
-
-            if (!bookings.CheckOut.HasValue)
-                ModelState.AddModelError("CheckOut", "Check-out date is required.");
-
-            if (bookings.CheckIn.HasValue && bookings.CheckOut.HasValue)
-            {
-                if (bookings.CheckOut <= bookings.CheckIn)
-                    ModelState.AddModelError("CheckOut", "Check-out must be after check-in.");
-            }
-
-            bool isRoomAvailable = false;
-            if (bookings.CheckIn.HasValue && bookings.CheckOut.HasValue)
-            {
-                isRoomAvailable = !_context.Bookings.Any(b =>
-                    b.RoomID == bookings.RoomID &&
-                    ((bookings.CheckIn >= b.CheckIn && bookings.CheckIn < b.CheckOut) ||
-                     (bookings.CheckOut > b.CheckIn && bookings.CheckOut <= b.CheckOut) ||
-                     (bookings.CheckIn <= b.CheckIn && bookings.CheckOut >= b.CheckOut))
-                );
-
-                if (!isRoomAvailable)
-                {
-                    ModelState.AddModelError("", "Room is already booked for the selected dates.");
-                }
-            }
-
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            bookings.ApplUserID = userId; // assign current user id
+            bookings.ApplUserID = userId;
 
-            if (bookings.CheckIn.HasValue && bookings.CheckOut.HasValue)
+            if (bookings.CheckIn != default && bookings.CheckOut != default)
             {
-                int duration = (bookings.CheckOut.Value - bookings.CheckIn.Value).Days;
-                if (duration > 0)
+                TimeSpan span = (TimeSpan)(bookings.CheckOut - bookings.CheckIn);
+                int duration = span.Days;
+
+                if (duration <= 0)
+                {
+                    ModelState.AddModelError("CheckOut", "Check-out must be after check-in.");
+                }
+                else
                 {
                     const decimal dailyRate = 75m;
                     bookings.TotalAmount = dailyRate * duration;
                 }
             }
+            else
+            {
+                ModelState.AddModelError("CheckIn", "Both check-in and check-out dates are required.");
+            }
 
-            // Assign default PaymentStatus until user has paid
+            // Check if room is available
+            bool roomUnavailable = await _context.Bookings.AnyAsync(b =>
+                b.RoomID == bookings.RoomID &&
+                (
+                    (bookings.CheckIn >= b.CheckIn && bookings.CheckIn < b.CheckOut) ||
+                    (bookings.CheckOut > b.CheckIn && bookings.CheckOut <= b.CheckOut) ||
+                    (bookings.CheckIn <= b.CheckIn && bookings.CheckOut >= b.CheckOut)
+                ));
+
+            if (roomUnavailable)
+            {
+                ModelState.AddModelError(string.Empty, "The selected room is not available during the chosen dates.");
+            }
+
             if (string.IsNullOrEmpty(bookings.PaymentStatus))
             {
                 bookings.PaymentStatus = "Pending";
@@ -158,16 +121,16 @@ namespace EpitomelHotel.Controllers
 
             if (!ModelState.IsValid)
             {
-                ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookings.RoomID);
-                ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Firstname", bookings.ApplUserID);
-                return View(bookings);
+                _context.Add(bookings);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Confirmation), new { id = bookings.BookingID });
             }
 
-            _context.Add(bookings);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Confirmation), new { id = bookings.BookingID });
-        }
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookings.RoomID);
+            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Firstname", bookings.ApplUserID);
 
+            return View(bookings);
+        }
 
 
         [Authorize]
@@ -178,19 +141,11 @@ namespace EpitomelHotel.Controllers
             {
                 return RedirectToAction(nameof(Index));
             }
-            else
-            {
-                var hasBookings = await _context.Bookings
-                    .AnyAsync(b => b.ApplUserID == userId);
 
-                if (hasBookings)
-                    return RedirectToAction(nameof(Index));
-                else
-                    return RedirectToAction(nameof(Create));
-            }
+            var hasBookings = await _context.Bookings.AnyAsync(b => b.ApplUserID == userId);
+            return hasBookings ? RedirectToAction(nameof(Index)) : RedirectToAction(nameof(Create));
         }
 
-        // GET: Bookings/Confirmation/5
         public async Task<IActionResult> Confirmation(int? id)
         {
             if (id == null)
@@ -207,104 +162,45 @@ namespace EpitomelHotel.Controllers
             return View(booking);
         }
 
-        [AllowAnonymous]
-        [HttpPost]
-        public IActionResult StartCreate(DateTime checkIn, DateTime checkOut, int roomId)
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction(nameof(Create), new { checkIn, checkOut, roomId });
-            }
-
-            // Store the values for use after login
-            TempData["CheckIn"] = checkIn.ToString("o");
-            TempData["CheckOut"] = checkOut.ToString("o");
-            TempData["RoomID"] = roomId.ToString();
-
-            // Redirect to login with return URL to ResumeCreate
-            var returnUrl = Url.Action("ResumeCreate", "Bookings");
-            return RedirectToPage("/Account/Login", new { area = "Identity", returnUrl });
-        }
-
-        [Authorize]
-        public async Task<IActionResult> ResumeCreate()
-        {
-            if (TempData["CheckIn"] == null || TempData["CheckOut"] == null || TempData["RoomID"] == null)
-                return RedirectToAction("Index", "Home");
-
-            DateTime checkIn = DateTime.Parse(TempData["CheckIn"].ToString());
-            DateTime checkOut = DateTime.Parse(TempData["CheckOut"].ToString());
-            int roomId = int.Parse(TempData["RoomID"].ToString());
-
-            // Auto submit booking
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            var booking = new Bookings
-            {
-                CheckIn = checkIn,
-                CheckOut = checkOut,
-                RoomID = roomId,
-                ApplUserID = userId,
-                PaymentStatus = "Pending"
-            };
-
-            int duration = (checkOut - checkIn).Days;
-            if (duration > 0)
-            {
-                const decimal dailyRate = 75m;
-                booking.TotalAmount = dailyRate * duration;
-            }
-            else
-            {
-                TempData["Error"] = "Invalid booking dates.";
-                return RedirectToAction("Index", "Home");
-            }
-
-            bool isRoomAvailable = !_context.Bookings.Any(b =>
-                b.RoomID == roomId &&
-                ((checkIn >= b.CheckIn && checkIn < b.CheckOut) ||
-                 (checkOut > b.CheckIn && checkOut <= b.CheckOut) ||
-                 (checkIn <= b.CheckIn && checkOut >= b.CheckOut))
-            );
-
-            if (!isRoomAvailable)
-            {
-                TempData["Error"] = "Room is already booked for the selected dates.";
-                return RedirectToAction("Index", "Home");
-            }
-
-            _context.Bookings.Add(booking);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Confirmation), new { id = booking.BookingID });
-        }
-
-
-        // GET: Bookings/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var bookings = await _context.Bookings.FindAsync(id);
             if (bookings == null)
-            {
                 return NotFound();
-            }
+
             ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Id", bookings.ApplUserID);
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookings.RoomID);
             return View(bookings);
         }
 
-        // POST: Bookings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("BookingID,CheckIn,CheckOut,TotalAmount,PaymentStatus,ApplUserID")] Bookings bookings)
+        public async Task<IActionResult> Edit(int id, [Bind("BookingID,CheckIn,CheckOut,TotalAmount,PaymentStatus,ApplUserID,RoomID")] Bookings bookings)
         {
             if (id != bookings.BookingID)
-            {
                 return NotFound();
+
+            if (bookings.CheckIn != default && bookings.CheckOut != default)
+            {
+                TimeSpan span = (TimeSpan)(bookings.CheckOut - bookings.CheckIn);
+                int duration = span.Days;
+
+                if (duration <= 0)
+                {
+                    ModelState.AddModelError("CheckOut", "Check-out must be after check-in.");
+                }
+                else
+                {
+                    const decimal dailyRate = 75m;
+                    bookings.TotalAmount = dailyRate * duration;
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("CheckIn", "Both check-in and check-out dates are required.");
             }
 
             if (!ModelState.IsValid)
@@ -317,41 +213,35 @@ namespace EpitomelHotel.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!BookingsExists(bookings.BookingID))
-                    {
                         return NotFound();
-                    }
                     else
-                    {
                         throw;
-                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Id", bookings.ApplUserID);
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookings.RoomID);
             return View(bookings);
         }
 
-        // GET: Bookings/Delete/5
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var bookings = await _context.Bookings
                 .Include(b => b.ApplUser)
                 .Include(b => b.Room)
                 .FirstOrDefaultAsync(m => m.BookingID == id);
+
             if (bookings == null)
-            {
                 return NotFound();
-            }
 
             return View(bookings);
         }
 
-        // POST: Bookings/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -360,9 +250,9 @@ namespace EpitomelHotel.Controllers
             if (bookings != null)
             {
                 _context.Bookings.Remove(bookings);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

@@ -38,6 +38,9 @@
     <div class="container mb-5">
         <div class="booking-form row justify-content-center">
             <form id="bookingForm" method="post" asp-controller="Bookings" asp-action="StartCreate" class="row">
+
+                @Html.AntiForgeryToken()
+
                 <div class="col-md-3 mb-3">
                     <label for="checkIn" class="form-label">Check-in Date</label>
                     <input type="date" id="checkIn" name="checkIn" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" required />

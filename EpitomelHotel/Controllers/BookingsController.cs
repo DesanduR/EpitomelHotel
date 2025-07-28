@@ -8,6 +8,7 @@ using EpitomelHotel.Areas.Identity.Data;
 using EpitomelHotel.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace EpitomelHotel.Controllers
 {
@@ -135,14 +136,27 @@ namespace EpitomelHotel.Controllers
 
             return View(bookings);
         }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> StartCreate(DateTime checkIn, DateTime checkOut, int roomId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            // If not logged in, save booking data and redirect to login
             if (userId == null)
-                return RedirectToAction("Login", "Account"); // Or redirect to login page
+            {
+                HttpContext.Session.SetString("PendingBooking", JsonSerializer.Serialize(new
+                {
+                    checkIn,
+                    checkOut,
+                    roomId
+                }));
+
+
+                return RedirectToPage("/Account/Login", new { area = "Identity" });
+            }
 
             // Validate dates
             if (checkIn >= checkOut)
@@ -151,7 +165,7 @@ namespace EpitomelHotel.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            // Check if room is available
+            // Check room availability
             bool roomUnavailable = await _context.Bookings.AnyAsync(b =>
                 b.RoomID == roomId &&
                 (
@@ -166,7 +180,7 @@ namespace EpitomelHotel.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            // Calculate total amount
+            // Calculate booking amount
             TimeSpan span = checkOut - checkIn;
             int duration = span.Days;
             const decimal dailyRate = 75m;
@@ -187,7 +201,75 @@ namespace EpitomelHotel.Controllers
             return RedirectToAction("Confirmation", new { id = booking.BookingID });
         }
 
-       
+        [Authorize]
+        public async Task<IActionResult> ResumeBooking()
+        {
+            if (!TempData.ContainsKey("PendingBooking"))
+                return RedirectToAction("Index", "Home");
+
+            var json = HttpContext.Session.GetString("PendingBooking");
+            if (string.IsNullOrEmpty(json))
+                return RedirectToAction("Index", "Home");
+
+            
+
+            var data = JsonSerializer.Deserialize<PendingBookingDto>(json);
+            if (data == null)
+                return RedirectToAction("Index", "Home");
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Validate dates
+            if (data.CheckIn >= data.CheckOut)
+            {
+                TempData["BookingError"] = "Check-out date must be after check-in.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Check room availability
+            bool roomUnavailable = await _context.Bookings.AnyAsync(b =>
+                b.RoomID == data.RoomId &&
+                (
+                    (data.CheckIn >= b.CheckIn && data.CheckIn < b.CheckOut) ||
+                    (data.CheckOut > b.CheckIn && data.CheckOut <= b.CheckOut) ||
+                    (data.CheckIn <= b.CheckIn && data.CheckOut >= b.CheckOut)
+                ));
+
+            if (roomUnavailable)
+            {
+                TempData["BookingError"] = "The selected room is not available for the chosen dates.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Proceed with booking
+            TimeSpan span = data.CheckOut - data.CheckIn;
+            int duration = span.Days;
+            const decimal dailyRate = 75m;
+
+            var booking = new Bookings
+            {
+                ApplUserID = userId,
+                RoomID = data.RoomId,
+                CheckIn = data.CheckIn,
+                CheckOut = data.CheckOut,
+                TotalAmount = dailyRate * duration,
+                PaymentStatus = "Pending"
+            };
+
+            _context.Bookings.Add(booking);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Confirmation", new { id = booking.BookingID });
+        }
+
+        private class PendingBookingDto
+        {
+            public DateTime CheckIn { get; set; }
+            public DateTime CheckOut { get; set; }
+            public int RoomId { get; set; }
+        }
+
+
         [Authorize]
         public async Task<IActionResult> RedirectToMyBookings()
         {

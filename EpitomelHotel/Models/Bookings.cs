@@ -19,12 +19,12 @@ namespace EpitomelHotel.Models
 
         [Required(ErrorMessage = "CheckIN required.")]
         [DataType(DataType.Date)]
-        public DateTime? CheckIn { get; set; }
+        public DateTime CheckIn { get; set; }
 
         [Required(ErrorMessage = "CheckOUT required.")]
         [DataType(DataType.Date)]
         
-        public DateTime? CheckOut { get; set; }
+        public DateTime CheckOut { get; set; }
 
         public decimal TotalAmount { get; set; }
 

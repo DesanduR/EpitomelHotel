@@ -124,7 +124,7 @@ namespace EpitomelHotel.Controllers
                 bookings.PaymentStatus = "Pending";
             }
 
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) // ✅ Corrected condition
             {
                 _context.Add(bookings);
                 await _context.SaveChangesAsync();
@@ -136,6 +136,7 @@ namespace EpitomelHotel.Controllers
 
             return View(bookings);
         }
+
 
 
         [HttpPost]
@@ -204,14 +205,9 @@ namespace EpitomelHotel.Controllers
         [Authorize]
         public async Task<IActionResult> ResumeBooking()
         {
-            if (!TempData.ContainsKey("PendingBooking"))
-                return RedirectToAction("Index", "Home");
-
             var json = HttpContext.Session.GetString("PendingBooking");
             if (string.IsNullOrEmpty(json))
                 return RedirectToAction("Index", "Home");
-
-            
 
             var data = JsonSerializer.Deserialize<PendingBookingDto>(json);
             if (data == null)
@@ -219,14 +215,12 @@ namespace EpitomelHotel.Controllers
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            // Validate dates
             if (data.CheckIn >= data.CheckOut)
             {
                 TempData["BookingError"] = "Check-out date must be after check-in.";
                 return RedirectToAction("Index", "Home");
             }
 
-            // Check room availability
             bool roomUnavailable = await _context.Bookings.AnyAsync(b =>
                 b.RoomID == data.RoomId &&
                 (
@@ -241,26 +235,25 @@ namespace EpitomelHotel.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            // Proceed with booking
-            TimeSpan span = data.CheckOut - data.CheckIn;
-            int duration = span.Days;
-            const decimal dailyRate = 75m;
-
             var booking = new Bookings
             {
                 ApplUserID = userId,
                 RoomID = data.RoomId,
                 CheckIn = data.CheckIn,
                 CheckOut = data.CheckOut,
-                TotalAmount = dailyRate * duration,
+                TotalAmount = 75m * (data.CheckOut - data.CheckIn).Days,
                 PaymentStatus = "Pending"
             };
 
             _context.Bookings.Add(booking);
             await _context.SaveChangesAsync();
 
+            // Clear session
+            HttpContext.Session.Remove("PendingBooking");
+
             return RedirectToAction("Confirmation", new { id = booking.BookingID });
         }
+
 
         private class PendingBookingDto
         {

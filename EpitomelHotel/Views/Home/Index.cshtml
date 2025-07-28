@@ -34,25 +34,27 @@
         </button>
     </div>
 
-    
     <div class="container mb-5">
         <div class="booking-form row justify-content-center">
             <form id="bookingForm" method="post" asp-controller="Bookings" asp-action="StartCreate" class="row">
-
                 @Html.AntiForgeryToken()
 
-                <div class="col-md-3 mb-3">
+                <div class="col-md-3">
                     <label for="checkIn" class="form-label">Check-in Date</label>
-                    <input type="date" id="checkIn" name="checkIn" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                    <input type="date" id="checkIn" name="checkIn" class="form-control"
+                           min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
                 </div>
-                <div class="col-md-3 mb-3">
+
+                <div class="col-md-3">
                     <label for="checkOut" class="form-label">Check-out Date</label>
-                    <input type="date" id="checkOut" name="checkOut" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                    <input type="date" id="checkOut" name="checkOut" class="form-control"
+                           min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
                     <span id="checkout-error" class="text-danger"></span>
                 </div>
-                <div class="col-md-3 mb-3">
+
+                <div class="col-md-3">
                     <label for="roomId" class="form-label">Room</label>
-                    <select id="roomId" name="roomId" class="form-select">
+                    <select id="roomId" name="roomId" class="form-select" required>
                         <option value="">Select Room</option>
                         <option value="1">Single</option>
                         <option value="2">Double</option>
@@ -62,8 +64,9 @@
                         <option value="6">Penthouse</option>
                     </select>
                 </div>
-                <div class="col-md-2 d-flex align-items-end mb-3">
-                    <button type="submit" class="btn btn-outline-light w-100">Book Now</button>
+
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Book Now</button>
                 </div>
             </form>
         </div>

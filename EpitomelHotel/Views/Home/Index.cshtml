@@ -41,14 +41,14 @@
 
                 <div class="col-md-3">
                     <label for="checkIn" class="form-label">Check-in Date</label>
-                    <input type="date" id="checkIn" name="checkIn" class="form-control"
-                           min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                    <input type="text" id="checkIn" name="checkIn" class="form-control" required />
+                    <span id="checkin-error" class="text-danger"></span>
+
                 </div>
 
                 <div class="col-md-3">
                     <label for="checkOut" class="form-label">Check-out Date</label>
-                    <input type="date" id="checkOut" name="checkOut" class="form-control"
-                           min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                    <input type="text" id="checkOut" name="checkOut" class="form-control" required />
                     <span id="checkout-error" class="text-danger"></span>
                 </div>
 
@@ -99,37 +99,88 @@
 
 </div>
 
+@section Scripts {
+    <script>
+        const unavailableDates = @Html.Raw(Json.Serialize(ViewBag.UnavailableDates ?? new List<string>()));
+
+        flatpickr("#checkIn", {
+            minDate: "today",
+            disable: unavailableDates,
+            dateFormat: "Y-m-d",
+            onChange: function(selectedDates, dateStr, instance) {
+                // Auto-set check-out to the next day
+                if (selectedDates.length > 0) {
+                    const nextDay = new Date(selectedDates[0]);
+                    nextDay.setDate(nextDay.getDate() + 1);
+                    checkOutPicker.set("minDate", nextDay);
+                }
+            }
+        });
+
+        const checkOutPicker = flatpickr("#checkOut", {
+            minDate: "today",
+            disable: unavailableDates,
+            dateFormat: "Y-m-d"
+        });
+    </script>
+}
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("bookingForm");
         const checkInInput = document.getElementById("checkIn");
         const checkOutInput = document.getElementById("checkOut");
         const checkOutError = document.getElementById("checkout-error");
 
+        // Create a check-in error span (just once)
+        let checkInError = document.getElementById("checkin-error");
+        if (!checkInError) {
+            checkInError = document.createElement("span");
+            checkInError.id = "checkin-error";
+            checkInError.classList.add("text-danger");
+            checkInInput.parentNode.appendChild(checkInError);
+        }
+
         function validateDates() {
-            const checkIn = new Date(checkInInput.value);
-            const checkOut = new Date(checkOutInput.value);
+            let isValid = true;
+            checkInError.innerText = "";
+            checkOutError.innerText = "";
+
+            if (!checkInInput.value) {
+                checkInError.innerText = "Please select a check-in date.";
+                isValid = false;
+            }
+
+            if (!checkOutInput.value) {
+                checkOutError.innerText = "Please select a check-out date.";
+                isValid = false;
+            }
 
             if (checkInInput.value && checkOutInput.value) {
+                const checkIn = new Date(checkInInput.value);
+                const checkOut = new Date(checkOutInput.value);
                 if (checkOut <= checkIn) {
                     checkOutInput.setCustomValidity("Check-out must be after check-in.");
                     checkOutError.innerText = "Check-out must be after check-in.";
+                    isValid = false;
                 } else {
                     checkOutInput.setCustomValidity("");
-                    checkOutError.innerText = "";
                 }
             }
+
+            return isValid;
         }
 
-        checkInInput.addEventListener("change", function () {
-            if (checkInInput.value) {
-                const minDate = new Date(checkInInput.value);
-                minDate.setDate(minDate.getDate() + 1);
-                checkOutInput.min = minDate.toISOString().split("T")[0];
-            }
-            validateDates();
-        });
-
+        checkInInput.addEventListener("change", validateDates);
         checkOutInput.addEventListener("change", validateDates);
+
+        form.addEventListener("submit", function (e) {
+            if (!validateDates()) {
+                e.preventDefault(); // Prevent form from submitting
+            }
+        });
     });
 </script>
+
+

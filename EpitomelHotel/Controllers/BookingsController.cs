@@ -39,6 +39,20 @@ namespace EpitomelHotel.Controllers
             // ✅ Return paginated list
             return View(await PaginatedList<Bookings>.CreateAsync(bookings.AsNoTracking(), currentPage, pageSize));
         }
+        private decimal GetPriceByRoomType(string roomType)
+        {
+            return roomType switch
+            {
+                "Single" => 40m,
+                "Double" => 55m,
+                "Deluxe" => 70m,
+                "Suite" => 85m,
+                "Family" => 65m,
+                "Penthouse" => 100m,
+                _ => 75m // Default fallback
+            };
+        }
+
 
         [Authorize]
         public IActionResult Create(DateTime? checkIn, DateTime? checkOut, int? roomId)
@@ -61,7 +75,6 @@ namespace EpitomelHotel.Controllers
             if (roomId.HasValue)
                 model.RoomID = roomId.Value;
 
-            // Safely calculate duration only if both dates are provided
             if (checkIn.HasValue && checkOut.HasValue && roomId.HasValue)
             {
                 TimeSpan span = checkOut.Value - checkIn.Value;
@@ -69,8 +82,14 @@ namespace EpitomelHotel.Controllers
 
                 if (duration > 0)
                 {
-                    const decimal dailyRate = 75m;
-                    model.TotalAmount = dailyRate * duration;
+                    var room = _context.Rooms.FirstOrDefault(r => r.RoomID == roomId.Value);
+                    if (room != null)
+                    {
+                        decimal dailyRate = GetPriceByRoomType(room.RoomType);
+                        decimal extraChargePerDay = 75m;
+                        model.TotalAmount = (dailyRate + extraChargePerDay) * duration;
+
+                    }
                 }
             }
 
@@ -96,8 +115,14 @@ namespace EpitomelHotel.Controllers
                 }
                 else
                 {
-                    const decimal dailyRate = 75m;
-                    bookings.TotalAmount = dailyRate * duration;
+                    var room = await _context.Rooms.FindAsync(bookings.RoomID);
+                    if (room != null)
+                    {
+                        decimal dailyRate = GetPriceByRoomType(room.RoomType);
+                        decimal extraChargePerDay = 75m;
+                        bookings.TotalAmount = (dailyRate + extraChargePerDay) * duration;
+
+                    }
                 }
             }
             else
@@ -105,7 +130,7 @@ namespace EpitomelHotel.Controllers
                 ModelState.AddModelError("CheckIn", "Both check-in and check-out dates are required.");
             }
 
-            // Check if room is available
+            // Room availability check
             bool roomUnavailable = await _context.Bookings.AnyAsync(b =>
                 b.RoomID == bookings.RoomID &&
                 (
@@ -124,7 +149,7 @@ namespace EpitomelHotel.Controllers
                 bookings.PaymentStatus = "Pending";
             }
 
-            if (!ModelState.IsValid) // ✅ Corrected condition
+            if (ModelState.IsValid)
             {
                 _context.Add(bookings);
                 await _context.SaveChangesAsync();
@@ -145,7 +170,6 @@ namespace EpitomelHotel.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            // If not logged in, save booking data and redirect to login
             if (userId == null)
             {
                 HttpContext.Session.SetString("PendingBooking", JsonSerializer.Serialize(new
@@ -155,18 +179,15 @@ namespace EpitomelHotel.Controllers
                     roomId
                 }));
 
-
                 return RedirectToPage("/Account/Login", new { area = "Identity" });
             }
 
-            // Validate dates
             if (checkIn >= checkOut)
             {
                 TempData["BookingError"] = "Check-out date must be after check-in.";
                 return RedirectToAction("Index", "Home");
             }
 
-            // Check room availability
             bool roomUnavailable = await _context.Bookings.AnyAsync(b =>
                 b.RoomID == roomId &&
                 (
@@ -181,10 +202,12 @@ namespace EpitomelHotel.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            // Calculate booking amount
             TimeSpan span = checkOut - checkIn;
             int duration = span.Days;
-            const decimal dailyRate = 75m;
+
+            var room = await _context.Rooms.FindAsync(roomId);
+            decimal dailyRate = room != null ? GetPriceByRoomType(room.RoomType) : 75m;
+            decimal extraChargePerDay = 75m;
 
             var booking = new Bookings
             {
@@ -192,15 +215,17 @@ namespace EpitomelHotel.Controllers
                 RoomID = roomId,
                 CheckIn = checkIn,
                 CheckOut = checkOut,
-                TotalAmount = dailyRate * duration,
+                TotalAmount = (dailyRate + extraChargePerDay) * duration,
                 PaymentStatus = "Pending"
             };
+
 
             _context.Bookings.Add(booking);
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Confirmation", new { id = booking.BookingID });
         }
+
 
         [Authorize]
         public async Task<IActionResult> ResumeBooking()

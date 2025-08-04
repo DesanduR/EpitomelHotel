@@ -17,7 +17,7 @@
 {
     <form asp-controller="Payments" asp-action="PayWithStripe" method="get">
         <input type="hidden" name="bookingId" value="@Model.BookingID" />
-        <button type="submit" class="btn btn-success">Pay with Stripe</button>
+        <button type="submit" class="btn btn-success"><i class="bi bi-credit-card"></i> Pay with Stripe</button>
     </form>
 }
 else

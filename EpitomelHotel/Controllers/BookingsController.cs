@@ -178,8 +178,13 @@ namespace EpitomelHotel.Controllers
                     checkOut,
                     roomId
                 }));
+                return RedirectToPage("/Account/Login", new
+                {
+                    area = "Identity",
+                    returnUrl = Url.Action("CompleteBooking", "Bookings")
+                });
 
-                return RedirectToPage("/Account/Login", new { area = "Identity" });
+
             }
 
             if (checkIn >= checkOut)
@@ -226,9 +231,8 @@ namespace EpitomelHotel.Controllers
             return RedirectToAction("Confirmation", new { id = booking.BookingID });
         }
 
-
         [Authorize]
-        public async Task<IActionResult> ResumeBooking()
+        public async Task<IActionResult> CompleteBooking()
         {
             var json = HttpContext.Session.GetString("PendingBooking");
             if (string.IsNullOrEmpty(json))
@@ -260,24 +264,29 @@ namespace EpitomelHotel.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            var room = await _context.Rooms.FindAsync(data.RoomId);
+            decimal dailyRate = room != null ? GetPriceByRoomType(room.RoomType) : 75m;
+            decimal extraChargePerDay = 75m;
+
             var booking = new Bookings
             {
                 ApplUserID = userId,
                 RoomID = data.RoomId,
                 CheckIn = data.CheckIn,
                 CheckOut = data.CheckOut,
-                TotalAmount = 75m * (data.CheckOut - data.CheckIn).Days,
+                TotalAmount = (dailyRate + extraChargePerDay) * (data.CheckOut - data.CheckIn).Days,
                 PaymentStatus = "Pending"
             };
 
             _context.Bookings.Add(booking);
             await _context.SaveChangesAsync();
 
-            // Clear session
+            // Clear the session
             HttpContext.Session.Remove("PendingBooking");
 
             return RedirectToAction("Confirmation", new { id = booking.BookingID });
         }
+
 
 
         private class PendingBookingDto
@@ -309,7 +318,7 @@ namespace EpitomelHotel.Controllers
         }
 
 
-  
+
 
         public async Task<IActionResult> Confirmation(int? id)
         {

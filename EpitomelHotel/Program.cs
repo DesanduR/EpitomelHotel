@@ -12,6 +12,8 @@ builder.Services.AddDbContext<EpitomelHotelDbContext>(options => options.UseSqlS
 builder.Services.AddDefaultIdentity<ApplUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<EpitomelHotelDbContext>();
+Stripe.StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
+
 
 // Add session service BEFORE building the app
 builder.Services.AddSession();

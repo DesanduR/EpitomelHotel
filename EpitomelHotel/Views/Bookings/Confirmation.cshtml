@@ -13,6 +13,19 @@
     Check-out date: @Model.CheckOut.ToShortDateString()
 </p>
 
+@if (Model.PaymentStatus != "Paid")
+{
+    <form asp-controller="Payments" asp-action="PayWithStripe" method="get">
+        <input type="hidden" name="bookingId" value="@Model.BookingID" />
+        <button type="submit" class="btn btn-success">Pay with Stripe</button>
+    </form>
+}
+else
+{
+    <div class="alert alert-success">Booking has been paid.</div>
+}
+
+
 <p>Total amount: @Model.TotalAmount.ToString("C")</p>
 
 <a href="@Url.Action("Index", "Bookings")">Back to bookings</a>

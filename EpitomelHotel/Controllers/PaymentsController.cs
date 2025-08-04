@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using EpitomelHotel.Areas.Identity.Data;
+using EpitomelHotel.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using EpitomelHotel.Areas.Identity.Data;
-using EpitomelHotel.Models;
+using Stripe;
+using Stripe.Checkout;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EpitomelHotel.Controllers
 {
@@ -44,6 +47,86 @@ namespace EpitomelHotel.Controllers
 
             return View(payments);
         }
+
+        [Authorize]
+        public async Task<IActionResult> PayWithStripe(int bookingId)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.Room)
+                .FirstOrDefaultAsync(b => b.BookingID == bookingId);
+
+            if (booking == null)
+                return NotFound();
+
+            var domain = $"{Request.Scheme}://{Request.Host}";
+
+            var options = new SessionCreateOptions
+            {
+                PaymentMethodTypes = new List<string> { "card" },
+                LineItems = new List<SessionLineItemOptions>
+            {
+                new SessionLineItemOptions
+                {
+                    PriceData = new SessionLineItemPriceDataOptions
+                    {
+                        UnitAmount = (long)(booking.TotalAmount * 100), // in cents
+                        Currency = "nzd",
+                        ProductData = new SessionLineItemPriceDataProductDataOptions
+                        {
+                            Name = $"{booking.Room.RoomType} Room Booking"
+                        }
+                    },
+                    Quantity = 1
+                }
+            },
+                Mode = "payment",
+                SuccessUrl = domain + Url.Action("PaymentSuccess", "Payments", new { bookingId }),
+                CancelUrl = domain + Url.Action("PaymentCancel", "Payments", new { bookingId }),
+            };
+
+            var service = new SessionService();
+            var session = service.Create(options);
+
+            return Redirect(session.Url);
+        }
+
+        public async Task<IActionResult> PaymentSuccess(int bookingId)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.Room)
+                .Include(b => b.ApplUser)
+                .FirstOrDefaultAsync(b => b.BookingID == bookingId);
+
+            if (booking == null)
+                return NotFound();
+
+            // Update booking status
+            booking.PaymentStatus = "Paid";
+
+            // Save a payment record
+            var payment = new Payments
+            {
+                BookingID = booking.BookingID,
+                Price = booking.TotalAmount,
+                PaymentDate = DateTime.Now,
+                PaymentMethod = "Stripe",
+                TotalAmount = booking.TotalAmount
+            };
+
+            _context.Payments.Add(payment);
+            await _context.SaveChangesAsync();
+
+            TempData["PaymentSuccess"] = "Payment was successful!";
+            return RedirectToAction("Confirmation", "Bookings", new { id = bookingId });
+        }
+
+        public IActionResult PaymentCancel(int bookingId)
+        {
+            TempData["PaymentError"] = "Payment was cancelled.";
+            return RedirectToAction("Confirmation", "Bookings", new { id = bookingId });
+        }
+
+
 
         // GET: Payments/Create
         public IActionResult Create()

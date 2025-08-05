@@ -41,6 +41,9 @@ namespace EpitomelHotel.Controllers
                 searchString = currentFilter;
             }
 
+            ViewData["CurrentFilter"] = searchString;
+
+
             var rooms = _context.Rooms.Include(r => r.Status).AsQueryable();
 
             // Search by RoomType name
@@ -76,7 +79,18 @@ namespace EpitomelHotel.Controllers
             }
 
             int pageSize = 5;
-            return View(await PaginatedList<Rooms>.CreateAsync(rooms.AsNoTracking(), pageNumber ?? 1, pageSize));
+         
+
+            var resultList = await PaginatedList<Rooms>.CreateAsync(rooms.AsNoTracking(), pageNumber ?? 1, pageSize);
+
+            // ✅ Check if there are no results and a search or filter was used
+            if (!resultList.Any() && (!string.IsNullOrEmpty(searchString) || !string.IsNullOrEmpty(roomType) || !string.IsNullOrEmpty(priceRange)))
+            {
+                ViewBag.NoResults = true;
+            }
+
+            return View(resultList);
+
         }
 
         // GET: Rooms/Details/5

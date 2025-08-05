@@ -96,7 +96,6 @@ namespace EpitomelHotel.Controllers
             return View(model);
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BookingID,CheckIn,CheckOut,TotalAmount,PaymentStatus,RoomID")] Bookings bookings)
@@ -104,44 +103,45 @@ namespace EpitomelHotel.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             bookings.ApplUserID = userId;
 
-            if (bookings.CheckIn != default && bookings.CheckOut != default)
-            {
-                TimeSpan span = (TimeSpan)(bookings.CheckOut - bookings.CheckIn);
-                int duration = span.Days;
-
-                if (duration <= 0)
-                {
-                    ModelState.AddModelError("CheckOut", "Check-out must be after check-in.");
-                }
-                else
-                {
-                    var room = await _context.Rooms.FindAsync(bookings.RoomID);
-                    if (room != null)
-                    {
-                        decimal dailyRate = GetPriceByRoomType(room.RoomType);
-                        decimal extraChargePerDay = 75m;
-                        bookings.TotalAmount = (dailyRate + extraChargePerDay) * duration;
-
-                    }
-                }
-            }
-            else
+            // Basic validation for dates
+            if (bookings.CheckIn == default || bookings.CheckOut == default)
             {
                 ModelState.AddModelError("CheckIn", "Both check-in and check-out dates are required.");
             }
-
-            // Room availability check
-            bool roomUnavailable = await _context.Bookings.AnyAsync(b =>
-                b.RoomID == bookings.RoomID &&
-                (
-                    (bookings.CheckIn >= b.CheckIn && bookings.CheckIn < b.CheckOut) ||
-                    (bookings.CheckOut > b.CheckIn && bookings.CheckOut <= b.CheckOut) ||
-                    (bookings.CheckIn <= b.CheckIn && bookings.CheckOut >= b.CheckOut)
-                ));
-
-            if (roomUnavailable)
+            else if (bookings.CheckOut <= bookings.CheckIn)
             {
-                ModelState.AddModelError(string.Empty, "The selected room is not available during the chosen dates.");
+                ModelState.AddModelError("CheckOut", "Check-out must be after check-in.");
+            }
+
+            // Validate room existence
+            var room = await _context.Rooms.FindAsync(bookings.RoomID);
+            if (room == null)
+            {
+                ModelState.AddModelError("RoomID", "Selected room does not exist.");
+            }
+
+            // If no errors so far, calculate total and check availability
+            if (ModelState.IsValid)
+            {
+                int duration = (bookings.CheckOut.Date - bookings.CheckIn.Date).Days;
+                decimal dailyRate = GetPriceByRoomType(room.RoomType);
+                decimal extraChargePerDay = 75m;
+                bookings.TotalAmount = (dailyRate + extraChargePerDay) * duration;
+
+                // Check availability: no overlapping bookings
+                bool roomUnavailable = await _context.Bookings.AnyAsync(b =>
+                    b.RoomID == bookings.RoomID &&
+                    (
+                        (bookings.CheckIn.Date >= b.CheckIn.Date && bookings.CheckIn.Date < b.CheckOut.Date) ||
+                        (bookings.CheckOut.Date > b.CheckIn.Date && bookings.CheckOut.Date <= b.CheckOut.Date) ||
+                        (bookings.CheckIn.Date <= b.CheckIn.Date && bookings.CheckOut.Date >= b.CheckOut.Date)
+                    )
+                );
+
+                if (roomUnavailable)
+                {
+                    ModelState.AddModelError(string.Empty, "The selected room is not available during the chosen dates.");
+                }
             }
 
             if (string.IsNullOrEmpty(bookings.PaymentStatus))
@@ -157,10 +157,10 @@ namespace EpitomelHotel.Controllers
             }
 
             ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookings.RoomID);
-            ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Firstname", bookings.ApplUserID);
 
             return View(bookings);
         }
+
 
 
 

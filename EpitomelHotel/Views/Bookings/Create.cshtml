@@ -67,14 +67,48 @@
 </div>
 
 <!-- Back to list for Admins -->
-@if (User.IsInRole("Admin"))
+@if (User.Identity.IsAuthenticated)
 {
     <div class="mt-3">
-        <a asp-action="Index">Back to List</a>
+        <a class="btn btn-secondary ms-2" asp-action="Index">Back to Full List</a>
     </div>
 }
 
 @section Scripts {
+    <script>
+        const unavailableDates = @Html.Raw(Json.Serialize(ViewBag.UnavailableDates ?? new List<string>()));
+
+        const checkOutPicker = flatpickr("#checkOut", {
+            minDate: "today",
+            disable: unavailableDates,
+            dateFormat: "Y-m-d"
+        });
+
+        flatpickr("#checkIn", {
+            minDate: "today",
+            disable: unavailableDates,
+            dateFormat: "Y-m-d",
+            onChange: function(selectedDates, dateStr, instance) {
+                if (selectedDates.length > 0) {
+                    const nextDay = new Date(selectedDates[0]);
+                    nextDay.setDate(nextDay.getDate() + 1);
+                    checkOutPicker.set("minDate", nextDay);
+
+                    // If current checkOut date is before minDate, reset it
+                    const currentCheckOut = checkOutPicker.selectedDates[0];
+                    if (!currentCheckOut || currentCheckOut < nextDay) {
+                        checkOutPicker.setDate(nextDay, true); // true to trigger onChange
+                    }
+                }
+            }
+        });
+    </script>
+}
+
+
+
+
+
     @await Html.PartialAsync("_ValidationScriptsPartial")
 
     <script>

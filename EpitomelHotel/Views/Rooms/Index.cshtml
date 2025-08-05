@@ -70,6 +70,15 @@
             </div>
         </form>
 
+        @if (!Model.Any() && !string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()))
+        {
+            <div class="alert alert-warning" role="alert">
+                No rooms found matching your search: <strong>@ViewData["CurrentFilter"]</strong>.
+            </div>
+        }
+
+
+
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
             @foreach (var item in Model)
             {
@@ -91,7 +100,7 @@
                         <div class="card-footer p-1">
                             @if (User.IsInRole("Admin"))
                             {
-                                <a class="btn btn-warning btn-sm me-1" asp-action="Edit" asp-route-id="@item.RoomID">Edit</a>
+                                <a class="btn btn-warning btn-sm me-1" asp-action="Edit" asp-route-id="@item.RoomID"><i class="bi bi-pencil-square"></i> Edit</a>
                                 <a class="btn btn-info btn-sm me-1" asp-action="Details" asp-route-id="@item.RoomID"><i class="bi bi-info-circle"></i> Details</a>
                                 <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@item.RoomID"><i class="bi bi-trash3"></i> Delete</a>
                             }

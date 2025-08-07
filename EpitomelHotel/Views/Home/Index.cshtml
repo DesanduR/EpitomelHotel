@@ -1,4 +1,6 @@
-﻿@{
+﻿@using System.Text.Json
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -39,19 +41,21 @@
             <form id="bookingForm" method="post" asp-controller="Bookings" asp-action="StartCreate" class="row">
                 @Html.AntiForgeryToken()
 
+                <!-- Check-In Date -->
                 <div class="col-md-3">
                     <label for="checkIn" class="form-label">Check-in Date</label>
                     <input type="text" id="checkIn" name="checkIn" class="form-control" required />
                     <span id="checkin-error" class="text-danger"></span>
-
                 </div>
 
+                <!-- Check-Out Date -->
                 <div class="col-md-3">
                     <label for="checkOut" class="form-label">Check-out Date</label>
                     <input type="text" id="checkOut" name="checkOut" class="form-control" required />
                     <span id="checkout-error" class="text-danger"></span>
                 </div>
 
+                <!-- Room Selection -->
                 <div class="col-md-3">
                     <label for="roomId" class="form-label">Room</label>
                     <select id="roomId" name="roomId" class="form-select" required>
@@ -65,6 +69,7 @@
                     </select>
                 </div>
 
+                <!-- Submit Button -->
                 <div class="col-md-2 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100">Book Now</button>
                 </div>
@@ -103,24 +108,31 @@
     <script>
         const unavailableDates = @Html.Raw(Json.Serialize(ViewBag.UnavailableDates ?? new List<string>()));
 
-        flatpickr("#checkIn", {
-            minDate: "today",
-            disable: unavailableDates,
-            dateFormat: "Y-m-d",
-            onChange: function(selectedDates, dateStr, instance) {
-                // Auto-set check-out to the next day
-                if (selectedDates.length > 0) {
-                    const nextDay = new Date(selectedDates[0]);
-                    nextDay.setDate(nextDay.getDate() + 1);
-                    checkOutPicker.set("minDate", nextDay);
-                }
-            }
-        });
-
+        // Initialize checkout picker first (needed for reference)
         const checkOutPicker = flatpickr("#checkOut", {
             minDate: "today",
             disable: unavailableDates,
             dateFormat: "Y-m-d"
+        });
+
+        // Initialize checkin picker with logic to set checkout min date
+        flatpickr("#checkIn", {
+            minDate: "today",
+            disable: unavailableDates,
+            dateFormat: "Y-m-d",
+            onChange: function (selectedDates) {
+                if (selectedDates.length > 0) {
+                    const nextDay = new Date(selectedDates[0]);
+                    nextDay.setDate(nextDay.getDate() + 1);
+                    checkOutPicker.set("minDate", nextDay);
+
+                    // Auto-reset checkout if it's invalid
+                    const currentCheckOut = checkOutPicker.selectedDates[0];
+                    if (!currentCheckOut || currentCheckOut < nextDay) {
+                        checkOutPicker.setDate(nextDay, true);
+                    }
+                }
+            }
         });
     </script>
 }

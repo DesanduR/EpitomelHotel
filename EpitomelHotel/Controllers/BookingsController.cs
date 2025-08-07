@@ -172,6 +172,8 @@ namespace EpitomelHotel.Controllers
 
             if (userId == null)
             {
+
+
                 HttpContext.Session.SetString("PendingBooking", JsonSerializer.Serialize(new
                 {
                     checkIn,

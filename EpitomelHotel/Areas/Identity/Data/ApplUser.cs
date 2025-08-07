@@ -14,10 +14,10 @@ public class ApplUser : IdentityUser
     public ICollection<Bookings> Bookings { get; set; }
 
 
-    [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[A-Z][a-z\s]*$", ErrorMessage = "First Name required.")]
+    [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[A-Z][a-z\s]*$", ErrorMessage = "First Name required and must start with capital letter and no numbers.")]
     public string Firstname { get; set; }
 
-    [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[A-Z][a-z\s]*$", ErrorMessage = "Last Name required.")]
+    [Required, MinLength(1), MaxLength(20), RegularExpression(@"^[A-Z][a-z\s]*$", ErrorMessage = "Last Name required and must start with capital letter and no numbers.")]
     public string Lastname { get; set; }
 
     [Required, MinLength(1), MaxLength(20), RegularExpression(@"^\+?\d{1,3}[- ]?\(?\d{3}\)?[- ]?\d{3}[- ]?\d{4}$", ErrorMessage = "Phone Number required.")]

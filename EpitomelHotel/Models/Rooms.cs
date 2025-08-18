@@ -16,6 +16,7 @@ namespace EpitomelHotel.Models
 
         [Required(ErrorMessage = "RoomType required.")]
         public string RoomType { get; set; }
+        public string RoomNumber { get; set; }
 
         [Required(ErrorMessage = "Price required.")]
         public decimal Price { get; set; }

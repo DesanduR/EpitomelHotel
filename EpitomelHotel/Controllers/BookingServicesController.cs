@@ -1,10 +1,11 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using EpitomelHotel.Areas.Identity.Data;
+using EpitomelHotel.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using EpitomelHotel.Areas.Identity.Data;
-using EpitomelHotel.Models;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace EpitomelHotel.Controllers
 {
@@ -23,6 +24,12 @@ namespace EpitomelHotel.Controllers
             var bookingServices = _context.BookingService
                 .Include(b => b.Room)
                 .Include(b => b.Service);
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Check if user has any bookings
+            ViewBag.HasBookings = await _context.Bookings.AnyAsync(b => b.ApplUserID == userId);
+
             return View(await bookingServices.ToListAsync());
         }
 
@@ -44,11 +51,12 @@ namespace EpitomelHotel.Controllers
         // GET: BookingServices/Create
         public IActionResult Create()
         {
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomNumber");
             ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName");
-            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType");
 
             return View();
         }
+
 
         // POST: BookingServices/Create
         [HttpPost]
@@ -63,7 +71,7 @@ namespace EpitomelHotel.Controllers
             }
 
             ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName", bookingService.ServiceID);
-            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookingService.RoomID);
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomNumber", bookingService.RoomID);
 
             return View(bookingService);
         }

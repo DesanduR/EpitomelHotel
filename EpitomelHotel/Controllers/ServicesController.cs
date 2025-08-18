@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EpitomelHotel.Areas.Identity.Data;
 using EpitomelHotel.Models;
+using System.Security.Claims;
+
 
 namespace EpitomelHotel.Controllers
 {

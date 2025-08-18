@@ -1,14 +1,14 @@
-﻿@using EpitomelHotel.Models
+﻿﻿@using EpitomelHotel.Models
 @model PaginatedList<EpitomelHotel.Models.Rooms>
 
 @{
     ViewData["Title"] = "Index";
 
-    
+
     var roomTypes = new List<string> { "Single", "Double", "Suite", "Deluxe" };
     var priceRanges = new List<string> { "Under 100", "100-200", "200-300", "300+" };
 
-    // Get current filters from query string or ViewData 
+    // Get current filters from query string or ViewData
     string selectedRoomType = ViewData["SelectedRoomType"] as string ?? "";
     string selectedPriceRange = ViewData["SelectedPriceRange"] as string ?? "";
 }
@@ -16,7 +16,7 @@
 <h1>Rooms</h1>
 
 <div class="row">
-    
+
     <div class="col-12 col-md-3 mb-4">
         <div class="card bg-dark text-light p-3 sticky-top" style="top: 1rem;">
             <h5>Filter by Room Type</h5>
@@ -59,9 +59,9 @@
         </div>
     </div>
 
-   
+
     <div class="col-12 col-md-9">
-        
+
         <form asp-action="Index" method="get" class="mb-3">
             <div class="input-group">
                 <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Find by name..." />
@@ -88,11 +88,12 @@
                         <div class="card-body p-2">
                             <h6 class="card-title mb-1">@item.RoomType</h6>
                             <p class="card-text small mb-0">
-                                <strong>Price:</strong> @item.Price <br />
+                                <strong>Price:</strong> @item.Price.ToString("C") <br />
+
                                 <strong>Capacity:</strong> @item.Capacity <br />
                                 @if (User.IsInRole("Admin"))
                                 {
-                                    <strong>Status:</strong> 
+                                    <strong>Status:</strong>
                                     @item.Status?.StatusName
                                 }
                             </p>
@@ -121,7 +122,7 @@
 
         <div class="pagination-container mt-5 d-flex justify-content-center">
 
-       
+
 
             <a asp-action="Index"
                asp-route-sortOrder="@ViewData["CurrentSort"]"

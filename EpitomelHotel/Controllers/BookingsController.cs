@@ -24,10 +24,19 @@ namespace EpitomelHotel.Controllers
         [Authorize]
         public async Task<IActionResult> Index(string searchString, int? pageNumber, int pageSize = 5)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var bookings = _context.Bookings
                 .Include(b => b.ApplUser)
                 .Include(b => b.Room)
+               
                 .AsQueryable();
+
+            if (!User.IsInRole("Admin"))
+            {
+                bookings = bookings.Where(b => b.ApplUserID == userId);
+            }
+
 
             if (!string.IsNullOrEmpty(searchString))
             {

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EpitomelHotel.Migrations
 {
     [DbContext(typeof(EpitomelHotelDbContext))]
-    [Migration("20250728230353_bookingfixed")]
-    partial class bookingfixed
+    [Migration("20250817233201_rooms")]
+    partial class rooms
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -212,6 +212,10 @@ namespace EpitomelHotel.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("RoomNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RoomType")
                         .IsRequired()

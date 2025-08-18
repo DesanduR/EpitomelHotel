@@ -21,15 +21,15 @@ namespace EpitomelHotel.Controllers
 
         // GET: Rooms
         public async Task<IActionResult> Index(
-     string sortOrder,
-     string currentFilter,
-     string searchString,
-     string roomType,       // new filter param
-     string priceRange,     // new filter param
-     int? pageNumber)
+            string sortOrder,
+            string currentFilter,
+            string searchString,
+            string roomType,       // filter param
+            string priceRange,     // filter param
+            int? pageNumber)
         {
             ViewData["CurrentSort"] = sortOrder;
-            ViewData["SelectedRoomType"] = roomType;       // pass filter to view
+            ViewData["SelectedRoomType"] = roomType;
             ViewData["SelectedPriceRange"] = priceRange;
 
             if (searchString != null)
@@ -43,22 +43,22 @@ namespace EpitomelHotel.Controllers
 
             ViewData["CurrentFilter"] = searchString;
 
-
             var rooms = _context.Rooms.Include(r => r.Status).AsQueryable();
 
-            // Search by RoomType name
+            // ✅ Search by RoomType or RoomNumber
             if (!string.IsNullOrEmpty(searchString))
             {
-                rooms = rooms.Where(r => r.RoomType.Contains(searchString));
+                rooms = rooms.Where(r => r.RoomType.Contains(searchString)
+                                      || r.RoomNumber.Contains(searchString));
             }
 
-            // Filter by roomType
+            // ✅ Filter by RoomType
             if (!string.IsNullOrEmpty(roomType))
             {
                 rooms = rooms.Where(r => r.RoomType == roomType);
             }
 
-            // Filter by priceRange
+            // ✅ Filter by Price Range
             if (!string.IsNullOrEmpty(priceRange))
             {
                 switch (priceRange)
@@ -78,36 +78,42 @@ namespace EpitomelHotel.Controllers
                 }
             }
 
+            // ✅ Sorting example (by price or type)
+            rooms = sortOrder switch
+            {
+                "price_asc" => rooms.OrderBy(r => r.Price),
+                "price_desc" => rooms.OrderByDescending(r => r.Price),
+                "type_asc" => rooms.OrderBy(r => r.RoomType),
+                "type_desc" => rooms.OrderByDescending(r => r.RoomType),
+                _ => rooms.OrderBy(r => r.RoomID), // default
+            };
+
+            // ✅ Pagination
             int pageSize = 5;
-         
+            var resultList = await PaginatedList<Rooms>.CreateAsync(
+                rooms.AsNoTracking(), pageNumber ?? 1, pageSize);
 
-            var resultList = await PaginatedList<Rooms>.CreateAsync(rooms.AsNoTracking(), pageNumber ?? 1, pageSize);
-
-            // ✅ Check if there are no results and a search or filter was used
-            if (!resultList.Any() && (!string.IsNullOrEmpty(searchString) || !string.IsNullOrEmpty(roomType) || !string.IsNullOrEmpty(priceRange)))
+            // ✅ Show "no results" flag if filtered but empty
+            if (!resultList.Any() && (!string.IsNullOrEmpty(searchString)
+                                    || !string.IsNullOrEmpty(roomType)
+                                    || !string.IsNullOrEmpty(priceRange)))
             {
                 ViewBag.NoResults = true;
             }
 
             return View(resultList);
-
         }
 
         // GET: Rooms/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var rooms = await _context.Rooms
                 .Include(r => r.Status)
                 .FirstOrDefaultAsync(m => m.RoomID == id);
-            if (rooms == null)
-            {
-                return NotFound();
-            }
+
+            if (rooms == null) return NotFound();
 
             return View(rooms);
         }
@@ -120,13 +126,11 @@ namespace EpitomelHotel.Controllers
         }
 
         // POST: Rooms/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("RoomID,RoomType,Price,Capacity,StatusID")] Rooms rooms)
+        public async Task<IActionResult> Create([Bind("RoomID,RoomType,RoomNumber,Price,Capacity,StatusID")] Rooms rooms)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 _context.Add(rooms);
                 await _context.SaveChangesAsync();
@@ -139,33 +143,23 @@ namespace EpitomelHotel.Controllers
         // GET: Rooms/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var rooms = await _context.Rooms.FindAsync(id);
-            if (rooms == null)
-            {
-                return NotFound();
-            }
+            if (rooms == null) return NotFound();
+
             ViewData["StatusID"] = new SelectList(_context.Status, "StatusID", "StatusName", rooms.StatusID);
             return View(rooms);
         }
 
         // POST: Rooms/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("RoomID,RoomType,Price,Capacity,StatusID")] Rooms rooms)
+        public async Task<IActionResult> Edit(int id, [Bind("RoomID,RoomType,RoomNumber,Price,Capacity,StatusID")] Rooms rooms)
         {
-            if (id != rooms.RoomID)
-            {
-                return NotFound();
-            }
+            if (id != rooms.RoomID) return NotFound();
 
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {
@@ -174,17 +168,12 @@ namespace EpitomelHotel.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!RoomsExists(rooms.RoomID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!RoomsExists(rooms.RoomID)) return NotFound();
+                    else throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["StatusID"] = new SelectList(_context.Status, "StatusID", "StatusName", rooms.StatusID);
             return View(rooms);
         }
@@ -192,18 +181,13 @@ namespace EpitomelHotel.Controllers
         // GET: Rooms/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var rooms = await _context.Rooms
                 .Include(r => r.Status)
                 .FirstOrDefaultAsync(m => m.RoomID == id);
-            if (rooms == null)
-            {
-                return NotFound();
-            }
+
+            if (rooms == null) return NotFound();
 
             return View(rooms);
         }
@@ -217,9 +201,8 @@ namespace EpitomelHotel.Controllers
             if (rooms != null)
             {
                 _context.Rooms.Remove(rooms);
+                await _context.SaveChangesAsync();
             }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

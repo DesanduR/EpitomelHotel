@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EpitomelHotel.Migrations
 {
     /// <inheritdoc />
-    public partial class bookingfixed : Migration
+    public partial class rooms : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -208,6 +208,7 @@ namespace EpitomelHotel.Migrations
                     RoomID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RoomType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RoomNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Capacity = table.Column<int>(type: "int", nullable: false),
                     StatusID = table.Column<int>(type: "int", nullable: false)

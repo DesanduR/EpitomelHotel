@@ -85,7 +85,7 @@ namespace EpitomelHotel.Controllers
             if (bookingService == null) return NotFound();
 
             ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName", bookingService.ServiceID);
-            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookingService.RoomID);
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomNumber", bookingService.RoomID);
 
             return View(bookingService);
         }
@@ -115,7 +115,7 @@ namespace EpitomelHotel.Controllers
             }
 
             ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName", bookingService.ServiceID);
-            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookingService.RoomID);
+            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomNumber", bookingService.RoomID);
 
             return View(bookingService);
         }

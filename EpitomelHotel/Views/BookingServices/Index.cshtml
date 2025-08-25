@@ -12,9 +12,7 @@
 <table class="table table-bordered" style="color: white">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ServiceCost)
-            </th>
+            
             <th>
                 @Html.DisplayNameFor(model => model.Room)
             </th>
@@ -27,9 +25,7 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ServiceCost)
-            </td>
+           
             <td>
                 @Html.DisplayFor(modelItem => item.Room.RoomType)
             </td>

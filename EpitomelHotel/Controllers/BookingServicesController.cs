@@ -21,17 +21,23 @@ namespace EpitomelHotel.Controllers
         // GET: BookingServices
         public async Task<IActionResult> Index()
         {
-            var bookingServices = _context.BookingService
-                .Include(b => b.Room)
-                .Include(b => b.Service);
-
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            var bookingServices = _context.BookingService
+                .Include(b => b.Room)
+                    .ThenInclude(r => r.Booking) // collection of bookings
+                .Include(b => b.Service)
+                .Where(b => b.Room.Booking.Any(book => book.ApplUserID == userId));
+
             // Check if user has any bookings
-            ViewBag.HasBookings = await _context.Bookings.AnyAsync(b => b.ApplUserID == userId);
+            ViewBag.HasBookings = await _context.Bookings
+                .AnyAsync(b => b.ApplUserID == userId);
 
             return View(await bookingServices.ToListAsync());
         }
+
+
+
 
         // GET: BookingServices/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -51,8 +57,22 @@ namespace EpitomelHotel.Controllers
         // GET: BookingServices/Create
         public IActionResult Create()
         {
-            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomNumber");
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Get only the rooms booked by this user
+            var userRooms = _context.Rooms
+                .Where(r => r.Booking.Any(b => b.ApplUserID == userId))
+                .Select(r => new { r.RoomID, r.RoomNumber }) // assuming RoomNumber is the display field
+                .ToList();
+
+            ViewData["RoomID"] = new SelectList(userRooms, "RoomID", "RoomNumber");
+
+            // All services can still be listed
             ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName");
+
+            // Also pass down whether the user has services already
+            ViewBag.HasServices = _context.BookingService
+                .Any(bs => bs.Room.Booking.Any(b => b.ApplUserID == userId));
 
             return View();
         }
@@ -61,8 +81,20 @@ namespace EpitomelHotel.Controllers
         // POST: BookingServices/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BookingServiceID,ServiceCost,RoomID,ServiceID")] BookingService bookingService)
+        public async Task<IActionResult> Create(BookingService bookingService)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Ensure the room belongs to the current user
+            var roomValid = await _context.Rooms
+                .AnyAsync(r => r.RoomID == bookingService.RoomID &&
+                               r.Booking.Any(b => b.ApplUserID == userId));
+
+            if (!roomValid)
+            {
+                ModelState.AddModelError("RoomID", "You can only select your own booked rooms.");
+            }
+
             if (!ModelState.IsValid)
             {
                 _context.Add(bookingService);
@@ -70,11 +102,18 @@ namespace EpitomelHotel.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            // repopulate dropdowns on error
+            var userRooms = _context.Rooms
+                .Where(r => r.Booking.Any(b => b.ApplUserID == userId))
+                .Select(r => new { r.RoomID, r.RoomNumber })
+                .ToList();
+
+            ViewData["RoomID"] = new SelectList(userRooms, "RoomID", "RoomNumber", bookingService.RoomID);
             ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName", bookingService.ServiceID);
-            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomNumber", bookingService.RoomID);
 
             return View(bookingService);
         }
+
 
         // GET: BookingServices/Edit/5
         public async Task<IActionResult> Edit(int? id)

@@ -1,4 +1,8 @@
 ﻿<!DOCTYPE html>
+@using EpitomelHotel.Areas.Identity.Data
+@using System.Security.Claims
+@inject EpitomelHotelDbContext _context
+
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -52,11 +56,25 @@
                             <li class="nav-item">
                                 <a class="nav-link text-light" asp-area="" asp-controller="Status" asp-action="Index">Status</a>
                             </li>
+                        }
+                        @{
+                            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                            var hasBooking = false;
 
+                            if (!string.IsNullOrEmpty(userId))
+                            {
+                                hasBooking = _context.Bookings.Any(b => b.ApplUserID == userId);
+                            }
+                        }
+
+                        @if (hasBooking)
+                        {
                             <li class="nav-item">
                                 <a class="nav-link text-light" asp-area="" asp-controller="Bookings" asp-action="RedirectToMyBookings">Bookings</a>
                             </li>
                         }
+
+                        
                     </ul>
                 </div>
                 <partial name ="_LoginPartial" />

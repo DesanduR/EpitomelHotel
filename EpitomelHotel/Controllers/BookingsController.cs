@@ -45,20 +45,20 @@ namespace EpitomelHotel.Controllers
 
             int currentPage = pageNumber ?? 1;
 
-            // ✅ Return paginated list
+            // Return paginated list
             return View(await PaginatedList<Bookings>.CreateAsync(bookings.AsNoTracking(), currentPage, pageSize));
         }
         private decimal GetPriceByRoomType(string roomType)
         {
             return roomType switch
             {
-                "Single" => 40m,
-                "Double" => 55m,
-                "Deluxe" => 70m,
-                "Suite" => 85m,
-                "Family" => 65m,
-                "Penthouse" => 100m,
-                _ => 75m // Default fallback
+                "Single" => 100m,
+                "Double" => 150m,
+                "Deluxe" => 180m,
+                "Suite" => 250m,
+                "Family" => 220m,
+                "Penthouse" => 400m,
+                _ => 75m // the defualt amount
             };
         }
 
@@ -129,7 +129,7 @@ namespace EpitomelHotel.Controllers
                 ModelState.AddModelError("RoomID", "Selected room does not exist.");
             }
 
-            // If no errors so far, calculate total and check availability
+            
             if (ModelState.IsValid)
             {
                 int duration = (bookings.CheckOut.Date - bookings.CheckIn.Date).Days;

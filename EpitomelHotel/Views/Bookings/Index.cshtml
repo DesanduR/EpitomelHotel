@@ -32,12 +32,12 @@ else{
 <table class="table table-bordered" style="color: white">
     <thead>
         <tr>
-            <th>
-                CheckIn
-            </th>
-            <th>
-                CheckOut
-            </th>
+                <th>
+                    @Html.ActionLink("CheckIn", "Index", new { sortOrder = ViewData["DateSortParm"], searchString = ViewData["CurrentFilter"] })
+                </th>
+                <th>
+                    @Html.ActionLink("CheckOut", "Index", new { sortOrder = ViewData["CheckOutSortParm"], searchString = ViewData["CurrentFilter"] })
+                </th>
             <th>
                 TotalAmount
             </th>
@@ -47,9 +47,9 @@ else{
             <th>
                 Room
             </th>
-            <th>
-                ApplUser
-            </th>
+                <th>
+                    @Html.ActionLink("ApplUser", "Index", new { sortOrder = ViewData["NameSortParm"], searchString = ViewData["CurrentFilter"] })
+                </th>
             <th>Actions</th>
         </tr>
     </thead>

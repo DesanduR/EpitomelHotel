@@ -22,14 +22,19 @@ namespace EpitomelHotel.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> Index(string searchString, int? pageNumber, int pageSize = 5)
+        [HttpGet]
+        public async Task<IActionResult> Index(string searchString, int? pageNumber, string sortOrder, int pageSize = 5)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // For keeping track of current sorting in the view
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
 
             var bookings = _context.Bookings
                 .Include(b => b.ApplUser)
                 .Include(b => b.Room)
-               
                 .AsQueryable();
 
             if (!User.IsInRole("Admin"))
@@ -37,17 +42,34 @@ namespace EpitomelHotel.Controllers
                 bookings = bookings.Where(b => b.ApplUserID == userId);
             }
 
-
             if (!string.IsNullOrEmpty(searchString))
             {
                 bookings = bookings.Where(b => b.ApplUser != null && b.ApplUser.Firstname.Contains(searchString));
             }
 
+            // Apply sorting
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    bookings = bookings.OrderByDescending(b => b.ApplUser.Firstname);
+                    break;
+                case "Date":
+                    bookings = bookings.OrderBy(b => b.CheckIn); // adjust property (CheckIn, CreatedAt, etc.)
+                    break;
+                case "date_desc":
+                    bookings = bookings.OrderByDescending(b => b.CheckIn);
+                    break;
+                default:
+                    bookings = bookings.OrderBy(b => b.ApplUser.Firstname);
+                    break;
+            }
+
             int currentPage = pageNumber ?? 1;
 
-            // Return paginated list
-            return View(await PaginatedList<Bookings>.CreateAsync(bookings.AsNoTracking(), currentPage, pageSize));
+            return View(await PaginatedList<Bookings>.CreateAsync(
+                bookings.AsNoTracking(), currentPage, pageSize));
         }
+
         private decimal GetPriceByRoomType(string roomType)
         {
             return roomType switch

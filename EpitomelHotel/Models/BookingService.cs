@@ -8,8 +8,7 @@ namespace EpitomelHotel.Models
         [Key]
         public int BookingServiceID { get; set; }
 
-        [Required(ErrorMessage = "ServiceCost is required.")]
-        [Range(0.0, double.MaxValue, ErrorMessage = "ServiceCost must be non-negative.")]
+       
         public decimal ServiceCost { get; set; }
 
         // One BookingService belongs to one Room

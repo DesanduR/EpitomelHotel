@@ -9,8 +9,7 @@ namespace EpitomelHotel.Models
         [Key]
         public int PaymentID { get; set; }
 
-        [Required(ErrorMessage = "Price is required.")]
-        [Range(0, double.MaxValue, ErrorMessage = "Price must be positive.")]
+      
         public decimal Price { get; set; }
 
         [Required]

@@ -23,18 +23,23 @@ namespace EpitomelHotel.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var bookingServices = _context.BookingService
-                .Include(b => b.Room)
-                    .ThenInclude(r => r.Booking) // collection of bookings
-                .Include(b => b.Service)
-                .Where(b => b.Room.Booking.Any(book => book.ApplUserID == userId));
+            // Get all rooms that the user has bookings for
+            var userRoomIds = await _context.Bookings
+                .Where(b => b.ApplUserID == userId)
+                .Select(b => b.RoomID)
+                .Distinct()
+                .ToListAsync();
 
-            // Check if user has any bookings
-            ViewBag.HasBookings = await _context.Bookings
-                .AnyAsync(b => b.ApplUserID == userId);
+            // Get all services linked to those rooms
+            var bookingServices = await _context.BookingService
+                .Include(bs => bs.Room)
+                .Include(bs => bs.Service)
+                .Where(bs => userRoomIds.Contains(bs.RoomID))
+                .ToListAsync();
 
-            return View(await bookingServices.ToListAsync());
+            return View(bookingServices);
         }
+
 
 
 

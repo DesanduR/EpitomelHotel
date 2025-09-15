@@ -54,7 +54,7 @@ namespace EpitomelHotel.Controllers
                     bookings = bookings.OrderByDescending(b => b.ApplUser.Firstname);
                     break;
                 case "Date":
-                    bookings = bookings.OrderBy(b => b.CheckIn); // adjust property (CheckIn, CreatedAt, etc.)
+                    bookings = bookings.OrderBy(b => b.CheckIn); 
                     break;
                 case "date_desc":
                     bookings = bookings.OrderByDescending(b => b.CheckIn);

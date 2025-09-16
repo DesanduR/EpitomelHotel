@@ -22,22 +22,28 @@ namespace EpitomelHotel.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var isAdmin = User.IsInRole("Admin");
 
-            // Get all rooms that the user has bookings for
-            var userRoomIds = await _context.Bookings
-                .Where(b => b.ApplUserID == userId)
-                .Select(b => b.RoomID)
-                .Distinct()
-                .ToListAsync();
+            IQueryable<BookingService> bookingServices;
 
-            // Get all services linked to those rooms
-            var bookingServices = await _context.BookingService
-                .Include(bs => bs.Room)
-                .Include(bs => bs.Service)
-                .Where(bs => userRoomIds.Contains(bs.RoomID))
-                .ToListAsync();
+            if (isAdmin)
+            {
+                // Admin sees all BookingService data (dummy + real)
+                bookingServices = _context.BookingService
+                    .Include(b => b.Room)
+                    .Include(b => b.Service);
+            }
+            else
+            {
+                // Regular users see only services tied to their bookings
+                bookingServices = _context.BookingService
+                    .Include(b => b.Room)
+                        .ThenInclude(r => r.Booking)
+                    .Include(b => b.Service)
+                    .Where(b => b.Room.Booking.Any(book => book.ApplUserID == userId));
+            }
 
-            return View(bookingServices);
+            return View(await bookingServices.ToListAsync());
         }
 
 

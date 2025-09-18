@@ -21,7 +21,7 @@ namespace EpitomelHotel.Data
                     return;
                 }
 
-                // ------------------- USERS -------------------
+               
                 var ApplUser = new ApplUser[]
                 {
                     new ApplUser { Firstname = "John", Lastname = "Doe", UserName = "john.doe@hotel.com", Email = "john.doe@hotel.com", Phone = "+64210000001" },
@@ -38,7 +38,6 @@ namespace EpitomelHotel.Data
                 Context.Users.AddRange(ApplUser);
                 Context.SaveChanges();
 
-                // ------------------- STATUS -------------------
                 var Status = new Status[]
                 {
                     new Status { StatusName = "Available" },
@@ -55,7 +54,6 @@ namespace EpitomelHotel.Data
                 Context.Status.AddRange(Status);
                 Context.SaveChanges();
 
-                // ------------------- ROOMS -------------------
                 var Rooms = new Rooms[]
                 {
                     new Rooms { RoomType = "Single", RoomNumber = "101", Price = 120, Capacity = 1, StatusID = Status[0].StatusID },
@@ -72,7 +70,7 @@ namespace EpitomelHotel.Data
                 Context.Rooms.AddRange(Rooms);
                 Context.SaveChanges();
 
-                // ------------------- SERVICES -------------------
+            
                 var Services = new Services[]
                 {
                     new Services { ServiceName = "Breakfast" },
@@ -89,7 +87,6 @@ namespace EpitomelHotel.Data
                 Context.Services.AddRange(Services);
                 Context.SaveChanges();
 
-                // ------------------- STAFF -------------------
                 var Staff = new Staff[]
                 {
                     new Staff { Firstname = "Ethan", Lastname = "Miller", Profession = "Receptionist", Phonenumber = "+64220000001" },
@@ -106,7 +103,6 @@ namespace EpitomelHotel.Data
                 Context.Staff.AddRange(Staff);
                 Context.SaveChanges();
 
-                // ------------------- BOOKINGS -------------------
                 var Bookings = new Bookings[]
                 {
                     new Bookings { ApplUserID = ApplUser[0].Id, RoomID = Rooms[0].RoomID, CheckIn = new DateTime(2025, 9, 1), CheckOut = new DateTime(2025, 9, 3), TotalAmount = 240, PaymentStatus = "Paid" },
@@ -123,7 +119,6 @@ namespace EpitomelHotel.Data
                 Context.Bookings.AddRange(Bookings);
                 Context.SaveChanges();
 
-                // ------------------- PAYMENTS -------------------
                 var Payments = new Payments[]
                 {
                     new Payments { BookingID = Bookings[0].BookingID, Price = 120, TotalAmount = 240, PaymentDate = new DateTime(2025, 9, 1), PaymentMethod = "Credit Card" },
@@ -140,7 +135,6 @@ namespace EpitomelHotel.Data
                 Context.Payments.AddRange(Payments);
                 Context.SaveChanges();
 
-                // ------------------- BOOKING SERVICES -------------------
                 var BookingService = new BookingService[]
                 {
                     new BookingService { RoomID = Rooms[0].RoomID, ServiceID = Services[0].ServiceID, ServiceCost = 20 },

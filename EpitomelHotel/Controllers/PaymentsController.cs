@@ -51,19 +51,23 @@ namespace EpitomelHotel.Controllers
         [Authorize]
         public async Task<IActionResult> PayWithStripe(int bookingId)
         {
+            // gets booking from database
             var booking = await _context.Bookings
                 .Include(b => b.Room)
                 .FirstOrDefaultAsync(b => b.BookingID == bookingId);
 
             if (booking == null)
                 return NotFound();
-
+            // this gets the current site domain that the web app is using
+            // this is required as stripe needs full absoulte URLs
             var domain = $"{Request.Scheme}://{Request.Host}";
 
             var options = new SessionCreateOptions
             {
+                // only card payments allowed
                 PaymentMethodTypes = new List<string> { "card" },
                 LineItems = new List<SessionLineItemOptions>
+                // shows what the user is paying for
             {
                 new SessionLineItemOptions
                 {
@@ -79,11 +83,13 @@ namespace EpitomelHotel.Controllers
                     Quantity = 1
                 }
             },
+                // one time payment 
+                // if the payment succeeds they are led to paymentsuccess and if the user cancels the payment they are led to paymentcancel 
                 Mode = "payment",
                 SuccessUrl = domain + Url.Action("PaymentSuccess", "Payments", new { bookingId }),
                 CancelUrl = domain + Url.Action("PaymentCancel", "Payments", new { bookingId }),
             };
-
+            // this creates a checkout session displying information of what the user is paying for
             var service = new SessionService();
             var session = service.Create(options);
 

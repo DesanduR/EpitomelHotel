@@ -80,7 +80,7 @@ namespace EpitomelHotel.Controllers
                 "Suite" => 250m,
                 "Family" => 220m,
                 "Penthouse" => 400m,
-                _ => 75m // the defualt amount
+                _ => 75m // the per night amount
             };
         }
 
@@ -134,7 +134,7 @@ namespace EpitomelHotel.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             bookings.ApplUserID = userId;
 
-            // Basic validation for dates
+            // validation for dates
             if (bookings.CheckIn == default || bookings.CheckOut == default)
             {
                 ModelState.AddModelError("CheckIn", "Both check-in and check-out dates are required.");
@@ -159,7 +159,7 @@ namespace EpitomelHotel.Controllers
                 decimal extraChargePerDay = 75m;
                 bookings.TotalAmount = (dailyRate + extraChargePerDay) * duration;
 
-                // Check availability: no overlapping bookings
+                // Check availability so there is no double bookings
                 bool roomUnavailable = await _context.Bookings.AnyAsync(b =>
                     b.RoomID == bookings.RoomID &&
                     (
@@ -200,32 +200,32 @@ namespace EpitomelHotel.Controllers
         public async Task<IActionResult> StartCreate(DateTime checkIn, DateTime checkOut, int roomId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
+            // if user is not logged in 
             if (userId == null)
             {
 
-
+                // saves booking details 
                 HttpContext.Session.SetString("PendingBooking", JsonSerializer.Serialize(new
                 {
                     checkIn,
                     checkOut,
                     roomId
-                }));
+                })); // redirects to login page
                 return RedirectToPage("/Account/Login", new
                 {
                     area = "Identity",
                     returnUrl = Url.Action("CompleteBooking", "Bookings")
                 });
-
+                // returns to complete booking to finish booking process
 
             }
-
+            // making sure the checkin date is before is checkout date
             if (checkIn >= checkOut)
             {
                 TempData["BookingError"] = "Check-out date must be after check-in.";
                 return RedirectToAction("Index", "Home");
             }
-
+            // checks if the room is already booked for those days
             bool roomUnavailable = await _context.Bookings.AnyAsync(b =>
                 b.RoomID == roomId &&
                 (
@@ -233,20 +233,20 @@ namespace EpitomelHotel.Controllers
                     (checkOut > b.CheckIn && checkOut <= b.CheckOut) ||
                     (checkIn <= b.CheckIn && checkOut >= b.CheckOut)
                 ));
-
+            // this does not happen as instead the check in and out dates are greyed out when dates are unavaliable
             if (roomUnavailable)
             {
                 TempData["BookingError"] = "The selected room is not available for the chosen dates.";
                 return RedirectToAction("Index", "Home");
             }
-
+            // calculates total price (room type + duration of nights)
             TimeSpan span = checkOut - checkIn;
             int duration = span.Days;
 
             var room = await _context.Rooms.FindAsync(roomId);
             decimal dailyRate = room != null ? GetPriceByRoomType(room.RoomType) : 75m;
             decimal extraChargePerDay = 75m;
-
+            // creates booking and saves to database
             var booking = new Bookings
             {
                 ApplUserID = userId,
@@ -263,7 +263,8 @@ namespace EpitomelHotel.Controllers
 
             return RedirectToAction("Confirmation", new { id = booking.BookingID });
         }
-
+        // this is where the user is led to after logging in 
+        // didnt work as the user is still led to the booking form to redo inputting the dates and room type
         [Authorize]
         public async Task<IActionResult> CompleteBooking()
         {
@@ -352,12 +353,14 @@ namespace EpitomelHotel.Controllers
 
 
 
-
+        // this method is for the confirmation of booking page
+        // user is led to this after successfully making a booking
         public async Task<IActionResult> Confirmation(int? id)
         {
             if (id == null)
                 return NotFound();
-
+            // takes the booking from database by using the booking id
+            // loads the room number and username 
             var booking = await _context.Bookings
                 .Include(b => b.Room)
                 .Include(b => b.ApplUser)
@@ -365,7 +368,8 @@ namespace EpitomelHotel.Controllers
 
             if (booking == null)
                 return NotFound();
-
+            // when the booking is found the user is led to confirmation view page
+            
             return View(booking);
         }
 

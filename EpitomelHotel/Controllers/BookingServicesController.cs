@@ -73,15 +73,14 @@ namespace EpitomelHotel.Controllers
             // Get only the rooms booked by this user
             var userRooms = _context.Rooms
                 .Where(r => r.Booking.Any(b => b.ApplUserID == userId))
-                .Select(r => new { r.RoomID, r.RoomNumber }) // assuming RoomNumber is the display field
+                .Select(r => new { r.RoomID, r.RoomNumber }) 
                 .ToList();
 
             ViewData["RoomID"] = new SelectList(userRooms, "RoomID", "RoomNumber");
 
-            // All services can still be listed
+            // All services are listed
             ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName");
 
-            // Also pass down whether the user has services already
             ViewBag.HasServices = _context.BookingService
                 .Any(bs => bs.Room.Booking.Any(b => b.ApplUserID == userId));
 

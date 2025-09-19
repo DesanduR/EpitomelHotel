@@ -405,8 +405,26 @@ namespace EpitomelHotel.Controllers
                 }
                 else
                 {
+
+
+                    // Base rate per night
                     const decimal dailyRate = 75m;
-                    bookings.TotalAmount = dailyRate * duration;
+
+                    // Room type rates
+                    var roomRates = new Dictionary<int, decimal>
+            {
+                { 1, 100m }, // Single
+                { 2, 150m }, // Double
+                { 3, 180m }, // Deluxe
+                { 4, 250m }, // Suite
+                { 5, 220m }, // Family
+                { 6, 400m }  // Penthouse
+            };
+
+                    decimal roomRate = roomRates.ContainsKey(bookings.RoomID) ? roomRates[bookings.RoomID] : 0m;
+
+                    // Final calculation
+                    bookings.TotalAmount = (dailyRate * duration) + roomRate;
                 }
             }
             else
@@ -414,7 +432,7 @@ namespace EpitomelHotel.Controllers
                 ModelState.AddModelError("CheckIn", "Both check-in and check-out dates are required.");
             }
 
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) 
             {
                 try
                 {
@@ -431,10 +449,12 @@ namespace EpitomelHotel.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            // Re-populate dropdowns if validation fails
             ViewData["ApplUserID"] = new SelectList(_context.ApplUser, "Id", "Id", bookings.ApplUserID);
             ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomType", bookings.RoomID);
             return View(bookings);
         }
+
 
 
         public async Task<IActionResult> Delete(int? id)

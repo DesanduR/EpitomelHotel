@@ -15,33 +15,28 @@
             <input type="hidden" asp-for="BookingID" />
             <div class="form-group">
                 <label asp-for="CheckIn" class="control-label"></label>
-                <input asp-for="CheckIn" class="form-control" />
+                <input asp-for="CheckIn" type="date" class="form-control" id="checkIn" />
                 <span asp-validation-for="CheckIn" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="CheckOut" class="control-label"></label>
-                <input asp-for="CheckOut" class="form-control" />
+                <input asp-for="CheckOut" type="date" class="form-control" id="checkOut" />
                 <span asp-validation-for="CheckOut" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="TotalAmount" class="control-label"></label>
-                <input asp-for="TotalAmount" class="form-control" />
+                <input asp-for="TotalAmount" class="form-control" id="totalAmount" readonly />
                 <span asp-validation-for="TotalAmount" class="text-danger"></span>
             </div>
+
+          
+            <input asp-for="PaymentStatus" type="hidden" />
+            <input asp-for="ApplUserID" type="hidden" />
+
             <div class="form-group">
-                <label asp-for="PaymentStatus" class="control-label"></label>
-                <input asp-for="PaymentStatus" class="form-control" />
-                <span asp-validation-for="PaymentStatus" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="RoomID" class="control-label"></label>
-                <select asp-for="RoomID" class="form-control" asp-items="ViewBag.RoomID"></select>
+                <label for="RoomID" class="control-label">Room Type</label>
+                <select asp-for="RoomID" class="form-control" asp-items="ViewBag.RoomID" id="roomType"></select>
                 <span asp-validation-for="RoomID" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ApplUserID" class="control-label"></label>
-                <select asp-for="ApplUserID" class="form-control" asp-items="ViewBag.ApplUserID"></select>
-                <span asp-validation-for="ApplUserID" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

@@ -1,5 +1,7 @@
 ﻿<!DOCTYPE html>
 @using EpitomelHotel.Areas.Identity.Data
+@using Microsoft.EntityFrameworkCore;
+
 @using System.Security.Claims
 @inject EpitomelHotelDbContext _context
 
@@ -43,9 +45,6 @@
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link text-light" asp-area="" asp-controller="BookingServices" asp-action="Index">BookingServices</a>
-                            </li>
-                            <li class="nav-item">
                                 <a class="nav-link text-light" asp-area="" asp-controller="Payments" asp-action="Index">Payments</a>
                             </li>
                             <li class="nav-item">
@@ -59,10 +58,18 @@
                         @{
                             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                             var hasBooking = false;
+                            var hasService = false;
 
                             if (!string.IsNullOrEmpty(userId))
                             {
+                                // Check if the user has any bookings
                                 hasBooking = _context.Bookings.Any(b => b.ApplUserID == userId);
+
+                                // Check if the user has any booked services
+                                hasService = _context.BookingService
+                                .Include(bs => bs.Room)
+                                .ThenInclude(r => r.Booking)
+                                .Any(bs => bs.Room.Booking.Any(b => b.ApplUserID == userId));
                             }
                         }
 
@@ -72,6 +79,14 @@
                                 <a class="nav-link text-light" asp-area="" asp-controller="Bookings" asp-action="RedirectToMyBookings">Bookings</a>
                             </li>
                         }
+
+                        @if (hasService || User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-area="" asp-controller="BookingServices" asp-action="Index">Services</a>
+                            </li>
+                        }
+
                     </ul>
 
                 </div>

@@ -9,26 +9,27 @@
 <div>
     <h4>BookingService</h4>
     <hr />
+    
+    @Html.HiddenFor(model => model.ServiceCost)
+
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ServiceCost)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ServiceCost)
-        </dd>
-        <dt class = "col-sm-2">
+    
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Room)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Room.RoomType)
         </dd>
-        <dt class = "col-sm-2">
+
+     
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Service)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Service.ServiceName)
         </dd>
     </dl>
+
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.BookingServiceID">Edit</a> |

@@ -124,7 +124,6 @@ namespace EpitomelHotel.Controllers
             return View(bookingService);
         }
 
-
         // GET: BookingServices/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -133,11 +132,22 @@ namespace EpitomelHotel.Controllers
             var bookingService = await _context.BookingService.FindAsync(id);
             if (bookingService == null) return NotFound();
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Get only the rooms booked by this user
+            var userRooms = _context.Rooms
+                .Where(r => r.Booking.Any(b => b.ApplUserID == userId))
+                .Select(r => new { r.RoomID, r.RoomNumber })
+                .ToList();
+
+            ViewData["RoomID"] = new SelectList(userRooms, "RoomID", "RoomNumber", bookingService.RoomID);
+
+            // All services are listed
             ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName", bookingService.ServiceID);
-            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomNumber", bookingService.RoomID);
 
             return View(bookingService);
         }
+
 
         // POST: BookingServices/Edit/5
         [HttpPost]
@@ -146,12 +156,25 @@ namespace EpitomelHotel.Controllers
         {
             if (id != bookingService.BookingServiceID) return NotFound();
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Ensure the room belongs to the current user
+            var roomValid = await _context.Rooms
+                .AnyAsync(r => r.RoomID == bookingService.RoomID &&
+                               r.Booking.Any(b => b.ApplUserID == userId));
+
+            if (!roomValid)
+            {
+                ModelState.AddModelError("RoomID", "You can only select your own booked rooms.");
+            }
+
             if (!ModelState.IsValid)
             {
                 try
                 {
                     _context.Update(bookingService);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -160,14 +183,20 @@ namespace EpitomelHotel.Controllers
                     else
                         throw;
                 }
-                return RedirectToAction(nameof(Index));
             }
 
+            // Repopulate dropdowns if validation fails
+            var userRooms = _context.Rooms
+                .Where(r => r.Booking.Any(b => b.ApplUserID == userId))
+                .Select(r => new { r.RoomID, r.RoomNumber })
+                .ToList();
+
+            ViewData["RoomID"] = new SelectList(userRooms, "RoomID", "RoomNumber", bookingService.RoomID);
             ViewData["ServiceID"] = new SelectList(_context.Services, "ServiceID", "ServiceName", bookingService.ServiceID);
-            ViewData["RoomID"] = new SelectList(_context.Rooms, "RoomID", "RoomNumber", bookingService.RoomID);
 
             return View(bookingService);
         }
+
 
         // GET: BookingServices/Delete/5
         public async Task<IActionResult> Delete(int? id)

@@ -2,17 +2,12 @@
 
 <h2>Booking Confirmation</h2>
 
-
 <p>Thank you, @(Model.ApplUser?.Firstname ?? "Guest"), your booking has been confirmed.</p>
 
-<p>Your assigned room number is: <strong>@(Model.Room?.RoomID.ToString() ?? "N/A")</strong></p>
+<p>Your assigned room number is: <strong>@(Model.Room?.RoomNumber ?? "N/A")</strong></p>
 
-<p>
-    Check-in date: @Model.CheckIn.ToShortDateString()
-</p>
-<p>
-    Check-out date: @Model.CheckOut.ToShortDateString()
-</p>
+<p>Check-in date: @Model.CheckIn.ToShortDateString()</p>
+<p>Check-out date: @Model.CheckOut.ToShortDateString()</p>
 
 @if (Model.PaymentStatus != "Paid")
 {
@@ -25,7 +20,6 @@ else
 {
     <div class="alert alert-success">Booking has been paid.</div>
 }
-
 
 <p>Total amount: @Model.TotalAmount.ToString("C")</p>
 

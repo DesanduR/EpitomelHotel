@@ -455,6 +455,34 @@ namespace EpitomelHotel.Controllers
             return View(bookings);
         }
 
+        // GET: Bookings/Details/5
+        [Authorize]
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var booking = await _context.Bookings
+                .Include(b => b.ApplUser)
+                .Include(b => b.Room)
+                .FirstOrDefaultAsync(m => m.BookingID == id);
+
+            if (booking == null)
+            {
+                return NotFound();
+            }
+
+            // If not Admin, restrict users from viewing other users' bookings
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!User.IsInRole("Admin") && booking.ApplUserID != userId)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View(booking);
+        }
 
 
         public async Task<IActionResult> Delete(int? id)

@@ -45,20 +45,20 @@ namespace EpitomelHotel.Controllers
 
             var rooms = _context.Rooms.Include(r => r.Status).AsQueryable();
 
-            // ✅ Search by RoomType or RoomNumber
+            // Search by RoomType or RoomNumber
             if (!string.IsNullOrEmpty(searchString))
             {
                 rooms = rooms.Where(r => r.RoomType.Contains(searchString)
                                       || r.RoomNumber.Contains(searchString));
             }
 
-            // ✅ Filter by RoomType
+            // Filter by RoomType
             if (!string.IsNullOrEmpty(roomType))
             {
                 rooms = rooms.Where(r => r.RoomType == roomType);
             }
 
-            // ✅ Filter by Price Range
+            // Filter by Price Range
             if (!string.IsNullOrEmpty(priceRange))
             {
                 switch (priceRange)
@@ -78,7 +78,7 @@ namespace EpitomelHotel.Controllers
                 }
             }
 
-            // ✅ Sorting example (by price or type)
+            // Sorting example (by price or type)
             rooms = sortOrder switch
             {
                 "price_asc" => rooms.OrderBy(r => r.Price),
@@ -88,12 +88,12 @@ namespace EpitomelHotel.Controllers
                 _ => rooms.OrderBy(r => r.RoomID), // default
             };
 
-            // ✅ Pagination
+            // Pagination
             int pageSize = 5;
             var resultList = await PaginatedList<Rooms>.CreateAsync(
                 rooms.AsNoTracking(), pageNumber ?? 1, pageSize);
 
-            // ✅ Show "no results" flag if filtered but empty
+            // Show "no results" flag if filtered but empty
             if (!resultList.Any() && (!string.IsNullOrEmpty(searchString)
                                     || !string.IsNullOrEmpty(roomType)
                                     || !string.IsNullOrEmpty(priceRange)))
@@ -130,7 +130,7 @@ namespace EpitomelHotel.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("RoomID,RoomType,RoomNumber,Price,Capacity,StatusID")] Rooms rooms)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 _context.Add(rooms);
                 await _context.SaveChangesAsync();
@@ -159,7 +159,7 @@ namespace EpitomelHotel.Controllers
         {
             if (id != rooms.RoomID) return NotFound();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 try
                 {

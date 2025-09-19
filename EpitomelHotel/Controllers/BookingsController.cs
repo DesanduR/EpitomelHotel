@@ -263,7 +263,7 @@ namespace EpitomelHotel.Controllers
 
             return RedirectToAction("Confirmation", new { id = booking.BookingID });
         }
-        // this is where the user is led to after logging in 
+        // this is where the users booking details being saved in session is retrieved
         // didnt work as the user is still led to the booking form to redo inputting the dates and room type
         [Authorize]
         public async Task<IActionResult> CompleteBooking()
